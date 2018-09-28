@@ -15,9 +15,13 @@ The JAR file `TermIndexGenerator.jar` is used to generate a set of unique terms 
 The possible data types that a term can have are:
 
 1: INTEGER
+
 2: DECIMAL
+
 3: LONG
+
 4: DATE
+
 5: STRING
 
 ```
