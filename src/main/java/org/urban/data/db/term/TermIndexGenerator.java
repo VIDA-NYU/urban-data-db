@@ -329,9 +329,8 @@ public class TermIndexGenerator {
         
         
         // Create the directory for the output file if it does not exist.
-        if (!outputFile.getParentFile().exists()) {
-            outputFile.getParentFile().mkdirs();
-        } else if (outputFile.exists()) {
+        FileSystem.createParentFolder(outputFile);
+        if (outputFile.exists()) {
             outputFile.delete();
         }
         
