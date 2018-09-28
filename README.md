@@ -22,6 +22,8 @@ The possible data types that a term can have are:
 5=STRING
 ```
 
+Usage:
+
 ```
 java -jar TermIndexGenerator.jar
   <input-directory> : Directory with column files
@@ -32,6 +34,9 @@ java -jar TermIndexGenerator.jar
 
 
 ### Compute Pairwise Column Similarity
+
+Use JAR file `ComputeColumnSimilarity.jar` to compute pairwise similarity between columns. Requires a term-index-file generated using `TermIndexGenerator.jar`.
+
 
 ```
 java -jar ComputeColumnSimilarity.jar
