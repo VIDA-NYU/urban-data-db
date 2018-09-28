@@ -55,8 +55,6 @@ public class TermIndexGenerator {
     private final static String COMMAND =
 	    "Usage:\n" +
 	    "  <input-directory>\n" +
-            "  <max-value-length> [-1 to ignore]\n" +
-            "  <max-token-count> [-1 to ignore]\n" +
 	    "  <mem-buffer-size>\n" +
 	    "  <output-file>";
 	    
@@ -391,22 +389,18 @@ public class TermIndexGenerator {
     
     public static void main(String[] args) {
         
-        if (args.length != 5) {
+        if (args.length != 3) {
             System.out.println(COMMAND);
             System.exit(-1);
         }
 
         File inputDirectory = new File(args[0]);
-        int maxValueLength = Integer.parseInt(args[1]);
-        int maxTokenCount = Integer.parseInt(args[2]);
-        int bufferSize = Integer.parseInt(args[3]);
-        File outputFile = new File(args[4]);
+        int bufferSize = Integer.parseInt(args[1]);
+        File outputFile = new File(args[2]);
         
         try {
             new TermIndexGenerator().run(
                     inputDirectory,
-                    maxValueLength,
-                    maxTokenCount,
                     bufferSize,
                     outputFile
             );
