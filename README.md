@@ -8,6 +8,7 @@ Compute Database Column Similarity
 
 The library contains JAR files to compute pairwise similarity between database columns. Computation assumes that a unique term index has been generated a-priori.
 
+
 ### Create Unique Term Index
 
 The JAR file `TermIndexGenerator.jar` is used to generate a set of unique terms in the database. Each term is assigned a unique identifier. With each term the index maintains the assigned data type and a comma-separated list of column:frequency pairs. Each pair denotes the frequency of the term in the identified column.
