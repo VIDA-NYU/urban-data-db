@@ -128,7 +128,7 @@ public class FlexibleColumnReader extends ColumnReader<ValueCounter> {
                         );
                        break;
                     default:
-                        throw new java.lang.RuntimeException("Unexpected token count:" + tokens.length);
+                        throw new java.lang.RuntimeException("Unexpected token count in file " + _file.getAbsolutePath() + " (Line " + line + "):" + tokens.length);
                 }
             } else {
                 try {
