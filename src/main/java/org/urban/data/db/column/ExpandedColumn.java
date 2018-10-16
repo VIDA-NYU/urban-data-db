@@ -32,27 +32,16 @@ public class ExpandedColumn extends Column {
     private IDSet _expansion;
     private IDSet _fullNodeSet = null;
     
-    public ExpandedColumn(Column column, IDSet expansion) {
+    public ExpandedColumn(int id, IDSet nodes, IDSet expansion) {
         
-        super(column.id(), column);
+        super(id, nodes);
         
         _expansion = expansion;
     }
     
-    public ExpandedColumn(Column column) {
+    public ExpandedColumn(int id, IDSet nodes) {
         
-        this(column, new HashIDSet());
-    }
-    
-    public ExpandedColumn(String line) {
-        
-        this(parse(line));
-        
-        String[] tokens = line.split("\t");
-        
-        if (tokens.length == 3) {
-            _expansion = new ImmutableIDSet(tokens[2]);
-        }
+        this(id, nodes, new HashIDSet());
     }
     
     public IDSet expansion() {
@@ -73,18 +62,25 @@ public class ExpandedColumn extends Column {
         return this;
     }
     
-    private static Column parse(String line) {
+    public static ExpandedColumn parse(String line) {
         
         String[] tokens = line.split("\t");
         
-        if ((tokens.length >= 2) && (tokens.length <= 3)) {
-            return new Column(
-                    Integer.parseInt(tokens[0]),
-                    new ImmutableIDSet(tokens[1])
-            );
-        } else {
-            throw new java.lang.IllegalArgumentException("Invalid file format: " + line);
-        }
+	switch (tokens.length) {
+	    case 2:
+		return new ExpandedColumn(
+			Integer.parseInt(tokens[0]),
+			new ImmutableIDSet(tokens[1])
+		);
+	    case 3:
+		return new ExpandedColumn(
+			Integer.parseInt(tokens[0]),
+			new ImmutableIDSet(tokens[1]),
+			new ImmutableIDSet(tokens[2])
+		);
+	    default:
+		throw new java.lang.IllegalArgumentException("Invalid file format: " + line);
+	}
     }
     
     public void write(PrintWriter out) {

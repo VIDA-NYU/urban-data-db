@@ -79,7 +79,7 @@ public class ExpandedColumnSet {
         try (BufferedReader in = FileSystem.openReader(file)) {
 	    String line;
 	    while ((line = in.readLine()) != null) {
-		columns.add(new ExpandedColumn(line));
+		columns.add(ExpandedColumn.parse(line));
 	    }
 	}
         return columns;
