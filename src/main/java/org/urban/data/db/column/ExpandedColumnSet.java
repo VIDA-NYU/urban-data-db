@@ -44,7 +44,7 @@ public class ExpandedColumnSet {
         for (ExpandedColumn colI : columns) {
             for (ExpandedColumn colJ : columns) {
                 if (colI.id() < colJ.id()) {
-                    if ((colI.sameSetAs(colJ)) && (colI.expansion().sameSetAs(colJ.expansion()))) {
+                    if (colI.expandedNodeSet().sameSetAs(colJ.expandedNodeSet())) {
                         compGen.edge(colI.id(), colJ.id());
                     }
                 }
