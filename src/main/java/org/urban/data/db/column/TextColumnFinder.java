@@ -25,20 +25,12 @@ import org.urban.data.db.io.TermIndexReader;
 import org.urban.data.db.term.TextColumnFilter;
 
 /**
- * Create dataset column files.
+ * Output list of identifier for columns that are classified as text columns
+ * based on the fraction of column values that have been labeled as text and the
+ * given text fraction threshold.
  * 
- * Parses a directory of dataset files. Transforms each CSV or TSV file in
- * the input directory into a set of files, one for each column in the dataset.
- * Considers any file with suffix .csv, .csv.gz, .tsv, or .tsv.gz as input
- * dataset files.
- * 
- * Assumes that the first row of each dataset file contains the column names.
- * 
- * Output files are numbered 0 to n. The file number corresponds to the unique
- * column identifier that will be used by other programs in the D6 workflow.
- * 
- * Information about individual columns is written to an output file. The file
- * is in JSON format and contains one record per database column.
+ * The output file contains the column identifier as the only value in each
+ * line.
  * 
  * @author Heiko Mueller <heiko.mueller@nyu.edu>
  */
