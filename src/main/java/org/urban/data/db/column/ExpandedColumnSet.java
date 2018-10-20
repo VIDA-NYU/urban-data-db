@@ -70,6 +70,13 @@ public class ExpandedColumnSet {
         return group(read(file));
     }
 
+    public IdentifiableObjectSet<ObjectCollection<ExpandedColumn>> groupColumns(
+            File file
+    ) throws java.io.IOException {
+        
+        return group(readColumns(file));
+    }
+
     public IdentifiableObjectSet<ExpandedColumn> read(
             File file
     ) throws java.io.IOException {
@@ -80,6 +87,21 @@ public class ExpandedColumnSet {
 	    String line;
 	    while ((line = in.readLine()) != null) {
 		columns.add(ExpandedColumn.parse(line));
+	    }
+	}
+        return columns;
+    }
+
+    public IdentifiableObjectSet<ExpandedColumn> readColumns(
+            File file
+    ) throws java.io.IOException {
+
+        HashObjectSet<ExpandedColumn> columns;
+	columns = new HashObjectSet<>();
+        try (BufferedReader in = FileSystem.openReader(file)) {
+	    String line;
+	    while ((line = in.readLine()) != null) {
+		columns.add(ExpandedColumn.parseColumn(line));
 	    }
 	}
         return columns;

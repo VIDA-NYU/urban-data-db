@@ -83,6 +83,22 @@ public class ExpandedColumn extends Column {
 	}
     }
     
+    public static ExpandedColumn parseColumn(String line) {
+        
+        String[] tokens = line.split("\t");
+        
+	switch (tokens.length) {
+	    case 2:
+	    case 3:
+		return new ExpandedColumn(
+			Integer.parseInt(tokens[0]),
+			new ImmutableIDSet(tokens[1])
+		);
+	    default:
+		throw new java.lang.IllegalArgumentException("Invalid file format: " + line);
+	}
+    }
+    
     public void write(PrintWriter out) {
         
         String line = this.id() + "\t" + this.toIntString();
