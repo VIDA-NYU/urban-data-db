@@ -17,6 +17,7 @@ package org.urban.data.db.io;
 
 import java.io.BufferedReader;
 import java.io.File;
+import org.apache.commons.lang3.StringUtils;
 import org.urban.data.core.set.HashObjectSet;
 import org.urban.data.core.set.IdentifiableObjectSet;
 import org.urban.data.core.io.FileSystem;
@@ -39,7 +40,7 @@ public class EquivalenceClassMetaReader {
 	    while ((line = in.readLine()) != null) {
 		String[] tokens = line.split("\t");
                 int eqId = Integer.parseInt(tokens[0]);
-                int termCount = tokens[1].split(",").length;
+                int termCount = StringUtils.countMatches(tokens[1], ",") + 1;
                 result.add(new TermSetMetaImpl(eqId, termCount));
             }
         }
