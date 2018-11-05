@@ -90,6 +90,7 @@ public class DatabaseLoadFileWriter {
             select.add(new JQuery("id"));
             select.add(new JQuery("dataset"));
             select.add(new JQuery("name"));
+	    select.add(new JQuery("distinctValueCount"));
             try (PrintWriter out = FileSystem.openPrintWriter(outputFile)) {
                 for (String[] tuple : engine.query(target, select)) {
                     out.println(StringHelper.joinStrings(tuple, "\t"));
@@ -99,9 +100,10 @@ public class DatabaseLoadFileWriter {
             script.println("CREATE TABLE " + tableName + " (");
             script.println("  id INTEGER NOT NULL,");
             script.println("  name VARCHAR(255) NOT NULL,");
-            script.println("  dataset CHAR(9) NOT NULL");
+            script.println("  dataset CHAR(9) NOT NULL,");
+            script.println("  term_count INTEGER NULL");
             script.println(");\n");
-            this.loadFile(tableName, "id, dataset, name", outputFile, script);
+            this.loadFile(tableName, "id, dataset, name, term_count", outputFile, script);
             this.primaryKey(tableName, "id", script);
             this.grantPrivileges(tableName, userName, script);
        }
