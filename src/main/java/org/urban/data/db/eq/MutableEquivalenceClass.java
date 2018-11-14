@@ -57,8 +57,24 @@ public class MutableEquivalenceClass extends IdentifiableObjectImpl implements E
     
     public void add(ColumnTerm term) {
         
+        // If terms a grouped based on similarity of their values prior to
+        // grouping them based on the set of columns they occur in a term may
+        // be added to an equivalence class that already contains the term. In
+        // that case we return immediately.
+        if (_terms.contains(term.id())) {
+            return;
+        }
+        
         _terms.add(term.id());
 	for (IdentifiableCount col : term.columns()) {
+            this.add(col);
+	}
+    }
+    
+    public void add(MutableEquivalenceClass eq) {
+        
+        _terms.add(eq.terms());
+	for (IdentifiableCount col : eq.columns()) {
             this.add(col);
 	}
     }
