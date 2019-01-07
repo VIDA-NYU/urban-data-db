@@ -29,10 +29,13 @@ import org.urban.data.db.term.TermConsumer;
  */
 public class TermFileWriter implements TermConsumer {
 
+    private static final int MAX_VALUE_LENGTH = 2048;
+    
     private final ObjectFilter _filter;
     private int _maxLength = 0;
     private final PrintWriter _outTerm;
     private final PrintWriter _outColumntermMap;
+    private int _trunc_count = 0;
     
     public TermFileWriter(
             ObjectFilter filter,
@@ -78,6 +81,9 @@ public class TermFileWriter implements TermConsumer {
         if (value.contains("\\")) {
             value = value.replaceAll("\\\\", "\\\\\\\\");
         }
+        if (value.length() > MAX_VALUE_LENGTH) {
+            value = value.substring(0, MAX_VALUE_LENGTH) + "__" + (_trunc_count++);
+        }
         if (value.length() > _maxLength) {
             _maxLength = value.length();
         }
@@ -92,5 +98,6 @@ public class TermFileWriter implements TermConsumer {
     @Override
     public void open() {
 
+        _trunc_count = 0;
     }
 }
