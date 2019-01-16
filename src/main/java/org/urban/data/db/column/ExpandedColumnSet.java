@@ -17,6 +17,7 @@ package org.urban.data.db.column;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.util.List;
 import org.urban.data.core.graph.components.UndirectedConnectedComponents;
 import org.urban.data.core.io.FileSystem;
 import org.urban.data.core.set.HashObjectSet;
@@ -67,14 +68,19 @@ public class ExpandedColumnSet {
             File file
     ) throws java.io.IOException {
         
-        return group(read(file));
+        return this.group(read(file));
     }
 
     public IdentifiableObjectSet<ObjectCollection<ExpandedColumn>> groupColumns(
-            File file
+            List<Column> columns
     ) throws java.io.IOException {
         
-        return group(readColumns(file));
+        HashObjectSet<ExpandedColumn> expandedColumns;
+        expandedColumns = new HashObjectSet<>();
+        for (Column column : columns) {
+            expandedColumns.add(new ExpandedColumn(column.id(), column));
+        }
+        return group(expandedColumns);
     }
 
     public IdentifiableObjectSet<ExpandedColumn> read(
@@ -87,21 +93,6 @@ public class ExpandedColumnSet {
 	    String line;
 	    while ((line = in.readLine()) != null) {
 		columns.add(ExpandedColumn.parse(line));
-	    }
-	}
-        return columns;
-    }
-
-    public IdentifiableObjectSet<ExpandedColumn> readColumns(
-            File file
-    ) throws java.io.IOException {
-
-        HashObjectSet<ExpandedColumn> columns;
-	columns = new HashObjectSet<>();
-        try (BufferedReader in = FileSystem.openReader(file)) {
-	    String line;
-	    while ((line = in.readLine()) != null) {
-		columns.add(ExpandedColumn.parseColumn(line));
 	    }
 	}
         return columns;
