@@ -55,6 +55,11 @@ public class MutableEquivalenceClass extends IdentifiableObjectImpl implements E
         _columns = new HashObjectSet<>();
     }
     
+    public MutableEquivalenceClass(int id) {
+        
+        this(id, new HashIDSet());
+    }
+    
     public void add(ColumnTerm term) {
         
         // If terms a grouped based on similarity of their values prior to
@@ -108,6 +113,21 @@ public class MutableEquivalenceClass extends IdentifiableObjectImpl implements E
         return Integer.compare(this.id(), el.id());
     }
 
+    public void merge(MutableEquivalenceClass node) {
+    
+        _terms.add(node.terms());
+        for (IdentifiableCount col : node.columns()) {
+            this.add(col);
+        }
+    }
+    
+    /**
+     * Remove the presence of the equivalence class in the column with the
+     * given identifier.
+     * 
+     * @param id
+     * @return 
+     */
     public int remove(int id) {
         
         if (_columns.contains(id)) {
