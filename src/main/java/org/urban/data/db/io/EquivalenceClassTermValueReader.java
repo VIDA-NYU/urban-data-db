@@ -116,12 +116,12 @@ public class EquivalenceClassTermValueReader {
     public IdentifiableObjectSet<EquivalenceClassTerm> read(IDSet nodes) throws java.io.IOException {
         
         TermSetCollector termCollector = new TermSetCollector();
-        new AdvancedEquivalenceClassReader().read(_eqFile, termCollector, nodes);
+        new AdvancedEquivalenceClassReader(_eqFile).read(termCollector, nodes);
         
         TermValueCollector valueCollector;
         valueCollector = new TermValueCollector(termCollector.terms());
         
-        new TermIndexReader().read(_termIndexFile, valueCollector);
+        new TermIndexReader(_termIndexFile).read(valueCollector);
         
         return valueCollector.terms();
     }

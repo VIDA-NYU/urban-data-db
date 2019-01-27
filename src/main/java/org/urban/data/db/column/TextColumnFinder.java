@@ -54,7 +54,7 @@ public class TextColumnFinder {
         FileSystem.createParentFolder(outputFile);
         
         TextColumnFilter filter = new TextColumnFilter();
-        new TermIndexReader().read(termFile, filter);
+        new TermIndexReader(termFile).read(filter);
         
         int textColumnCount = 0;
         try (PrintWriter out = FileSystem.openPrintWriter(outputFile)) {

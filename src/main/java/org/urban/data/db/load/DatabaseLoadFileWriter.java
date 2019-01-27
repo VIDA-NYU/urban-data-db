@@ -282,7 +282,7 @@ public class DatabaseLoadFileWriter {
                     outTermNodeMap,
                     termThreshold
             );
-            new AdvancedEquivalenceClassReader().read(eqFile, eqWriter);
+            new AdvancedEquivalenceClassReader(eqFile).read(eqWriter);
             if (termThreshold >= 0) {
                 termFilter = eqWriter.terms();
             } else {
@@ -303,7 +303,7 @@ public class DatabaseLoadFileWriter {
                     outTerms,
                     outColumnTermMap
             );
-            new TermIndexReader().read(termIndexFile, writer);
+            new TermIndexReader(termIndexFile).read(writer);
             maxTermLength = writer.maxLength();
         }
         

@@ -17,18 +17,16 @@ package org.urban.data.db.term;
 
 import java.io.File;
 import java.io.PrintWriter;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.urban.data.core.constraint.ThresholdConstraint;
 import org.urban.data.core.io.FileSystem;
-import org.urban.data.core.object.Entity;
+import org.urban.data.core.set.EntitySet;
 import org.urban.data.core.similarity.JaroWinklerStringSimilarity;
 import org.urban.data.core.similarity.LevenshteinStringSimilarity;
 import org.urban.data.core.similarity.ParallelStringSimilarityComputer;
 import org.urban.data.core.similarity.SimilarityWriter;
 import org.urban.data.core.similarity.StringSimilarityComputer;
-import org.urban.data.db.io.EntitySetReader;
 
 /**
  * Write pairwise similarity between terms to file.
@@ -71,9 +69,9 @@ public class TermSimilarityWriter {
             System.exit(-1);
         }
         
-        List<Entity> terms = null;
+        EntitySet terms = null;
         try {
-            terms = new EntitySetReader().read(termFile);
+            terms = new EntitySet(termFile);
         } catch (java.io.IOException ex) {
             LOGGER.log(Level.SEVERE, "READ TERMS", ex);
             System.exit(-1);
@@ -81,7 +79,7 @@ public class TermSimilarityWriter {
         
         try (PrintWriter out = FileSystem.openPrintWriter(outputFile)) {
             new ParallelStringSimilarityComputer().run(
-                    terms,
+                    terms.toList(),
                     func,
                     threads,
                     new SimilarityWriter(out)

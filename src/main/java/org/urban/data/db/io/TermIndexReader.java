@@ -29,13 +29,20 @@ import org.urban.data.db.term.TermConsumer;
  */
 public class TermIndexReader {
     
-    public void read(File file, TermConsumer consumer) throws java.io.IOException {
+    private final File _file;
+    
+    public TermIndexReader(File file) {
+	
+	_file = file;
+    }
+    
+    public void read(TermConsumer consumer) throws java.io.IOException {
         
         consumer.open();
         
         ValueTypeFactory types = new ValueTypeFactory();
         
-        try (BufferedReader in = FileSystem.openReader(file)) {
+        try (BufferedReader in = FileSystem.openReader(_file)) {
 	    String line;
 	    while ((line = in.readLine()) != null) {
 		String[] tokens = line.split("\t");

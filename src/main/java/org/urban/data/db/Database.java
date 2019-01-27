@@ -24,17 +24,56 @@ import org.urban.data.core.set.MutableObjectSet;
 import org.urban.data.core.util.count.IdentifiableCount;
 import org.urban.data.db.column.Column;
 import org.urban.data.db.column.ColumnElement;
+import org.urban.data.db.eq.EquivalenceClass;
+import org.urban.data.db.io.EquivalenceClassReader;
+import org.urban.data.db.io.TermIndexReader;
+import org.urban.data.db.term.ColumnTerm;
+import org.urban.data.db.term.TermConsumer;
 
 /**
  *
  * @author Heiko Mueller <heiko.mueller@nyu.edu>
- * @param <T>
  */
-public class Database<T extends ColumnElement<IdentifiableCount>> implements Iterable<Column> {
+public class Database implements Iterable<Column> {
+    
+    private class ColumnBuilder implements TermConsumer {
+
+	private MutableObjectSet<Column> _columns;
+	
+	public ColumnBuilder(MutableObjectSet<Column> columns) {
+	    
+	    _columns = columns;
+	}
+	
+	@Override
+	public void close() {
+	    
+	}
+
+	@Override
+	public void consume(ColumnTerm term) {
+	    
+	    for (IdentifiableCount col : term.columns()) {
+		Column column;
+		if (_columns.contains(col.id())) {
+		    column = _columns.get(col.id());
+		} else {
+		    column = new Column(col.id());
+		    _columns.add(column);
+		}
+		column.add(term.id());
+	    }
+	}
+
+	@Override
+	public void open() {
+	    
+	}
+    }
     
     private final MutableObjectSet<Column> _columns;
     
-    public Database(Iterable<T> nodes) {
+    public <T extends ColumnElement<IdentifiableCount>> Database(Iterable<T> nodes) {
         
         _columns = new HashObjectSet<>();
         
@@ -50,6 +89,18 @@ public class Database<T extends ColumnElement<IdentifiableCount>> implements Ite
                 column.add(node.id());
             }
         }
+    }
+    
+    public <T extends EquivalenceClass> Database(EquivalenceClassReader<T> reader) throws java.io.IOException {
+	
+	this(reader.readIndex());
+    }
+    
+    public Database(TermIndexReader reader) throws java.io.IOException {
+	
+        _columns = new HashObjectSet<>();
+	
+	reader.read(new ColumnBuilder(_columns));
     }
     
     public IDSet columnIds() {

@@ -77,7 +77,7 @@ public class TermGroupGenerator {
     public List<IDSet> run(File termFile) throws java.io.IOException {
         
         TermCollector consumer = new TermCollector();
-        new TermIndexReader().read(termFile, consumer);
+        new TermIndexReader(termFile).read(consumer);
         List<Entity> terms = consumer.terms();
         
         List<IDSet> result = new ArrayList<>();

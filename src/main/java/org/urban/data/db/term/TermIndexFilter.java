@@ -91,8 +91,8 @@ public class TermIndexFilter {
     ) throws java.io.IOException {
     
         try (PrintWriter out = FileSystem.openPrintWriter(outputFile)) {
-            new TermIndexReader()
-                    .read(inputFile, new TermColumnFilter(columnFilter, out));
+            new TermIndexReader(inputFile)
+                    .read(new TermColumnFilter(columnFilter, out));
         }
         
     }

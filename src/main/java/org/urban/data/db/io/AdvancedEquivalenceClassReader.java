@@ -15,6 +15,7 @@
  */
 package org.urban.data.db.io;
 
+import java.io.File;
 import org.urban.data.core.set.ImmutableIDSet;
 import org.urban.data.db.eq.AdvancedEquivalenceClass;
 
@@ -24,6 +25,11 @@ import org.urban.data.db.eq.AdvancedEquivalenceClass;
  */
 public class AdvancedEquivalenceClassReader extends EquivalenceClassReader<AdvancedEquivalenceClass> {
 
+    public AdvancedEquivalenceClassReader(File file) {
+	
+	super(file);
+    }
+    
     @Override
     public AdvancedEquivalenceClass equivalenceClassFromString(String[] tokens) {
 

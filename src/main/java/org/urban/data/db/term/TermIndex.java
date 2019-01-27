@@ -81,7 +81,7 @@ public class TermIndex implements TermConsumer {
     
     public TermIndex read(File file) throws java.io.IOException {
     
-        new TermIndexReader().read(file, this);
+        new TermIndexReader(file).read(this);
         
         return this;
     }

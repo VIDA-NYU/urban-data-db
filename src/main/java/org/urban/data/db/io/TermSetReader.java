@@ -69,7 +69,7 @@ public class TermSetReader {
         
         TermFilter consumer = new TermFilter(filter);
         
-        new TermIndexReader().read(file, consumer);
+        new TermIndexReader(file).read(consumer);
         
         return consumer.terms();
     }

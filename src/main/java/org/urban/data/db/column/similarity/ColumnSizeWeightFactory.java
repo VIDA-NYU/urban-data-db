@@ -65,7 +65,7 @@ public class ColumnSizeWeightFactory extends ColumnWeightFactory {
 
         ColumnSizeComputer consumer = new ColumnSizeComputer();
         
-        new TermIndexReader().read(file, consumer);
+        new TermIndexReader(file).read(consumer);
         
         return consumer.getColumnSizes();
     }

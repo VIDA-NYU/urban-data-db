@@ -15,6 +15,7 @@
  */
 package org.urban.data.db.io;
 
+import java.io.File;
 import org.urban.data.db.eq.EquivalenceClass;
 import org.urban.data.db.eq.ImmutableEquivalenceClass;
 
@@ -25,6 +26,11 @@ import org.urban.data.db.eq.ImmutableEquivalenceClass;
  */
 public class DefaultEquivalenceClassReader extends EquivalenceClassReader<EquivalenceClass> {
 
+    public DefaultEquivalenceClassReader(File file) {
+	
+	super(file);
+    }
+    
     @Override
     public EquivalenceClass equivalenceClassFromString(String[] tokens) {
 

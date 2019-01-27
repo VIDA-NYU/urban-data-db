@@ -15,6 +15,7 @@
  */
 package org.urban.data.db.io;
 
+import java.io.File;
 import org.urban.data.core.set.HashIDSet;
 import org.urban.data.db.column.ColumnElementHelper;
 import org.urban.data.db.eq.MutableEquivalenceClass;
@@ -27,6 +28,11 @@ import org.urban.data.db.eq.MutableEquivalenceClass;
  */
 public class MutableEquivalenceClassReader extends EquivalenceClassReader<MutableEquivalenceClass> {
 
+    public MutableEquivalenceClassReader(File file) {
+	
+	super(file);
+    }
+    
     @Override
     public MutableEquivalenceClass equivalenceClassFromString(String[] tokens) {
 

@@ -105,7 +105,7 @@ public class ComputeColumnSimilarity {
     ) throws java.lang.InterruptedException, java.io.IOException {
         
         Database db = new Database();
-        new TermIndexReader().read(termIndexFile, db);
+        new TermIndexReader(termIndexFile).read(db);
         
         if (similarityThreshold.compareTo(BigDecimal.ZERO) > 0) {
             consumer = new SimilarityThresholdFilter(

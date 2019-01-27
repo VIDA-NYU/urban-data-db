@@ -15,6 +15,7 @@
  */
 package org.urban.data.db.io;
 
+import java.io.File;
 import org.urban.data.core.set.HashIDSet;
 import org.urban.data.db.eq.EnhancedEquivalenceClass;
 
@@ -25,6 +26,11 @@ import org.urban.data.db.eq.EnhancedEquivalenceClass;
  */
 public class EnhancedEquivalenceClassReader extends EquivalenceClassReader<EnhancedEquivalenceClass> {
 
+    public EnhancedEquivalenceClassReader(File file) {
+	
+	super(file);
+    }
+    
     @Override
     public EnhancedEquivalenceClass equivalenceClassFromString(String[] tokens) {
 

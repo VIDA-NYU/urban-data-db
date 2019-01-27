@@ -88,7 +88,7 @@ public abstract class ColumnWeightFactory {
         
         IdentifiableCounterSet columnScales = this.getScales(file);
         TermWeightGenerator consumer = new TermWeightGenerator(columnScales);
-        new TermIndexReader().read(file, consumer);
+        new TermIndexReader(file).read(consumer);
         return consumer.getWeights();
     }
 }

@@ -69,7 +69,7 @@ public class MaxNormalizedColumnWeightFactory extends ColumnWeightFactory {
 
         ColumnMaxComputer consumer = new ColumnMaxComputer();
         
-        new TermIndexReader().read(file, consumer);
+        new TermIndexReader(file).read(consumer);
         
         return consumer.getColumnMaxima();
     }

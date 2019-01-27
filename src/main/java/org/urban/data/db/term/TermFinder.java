@@ -50,7 +50,7 @@ public class TermFinder implements TermConsumer {
 
     public Entity find(File file) throws java.io.IOException {
     
-        new TermIndexReader().read(file, this);
+        new TermIndexReader(file).read(this);
         
         return _term;
     }

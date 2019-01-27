@@ -212,7 +212,7 @@ public class EQFileGenerator {
                 // Merge grouped terms into the initial set of equivalence
                 // classes
                 TermGroupMerger merger = new TermGroupMerger(groups);
-                new TermIndexReader().read(inputFile, merger);
+                new TermIndexReader(inputFile).read(merger);
                 for (MutableEquivalenceClass eq : merger.equivalenceClasses()) {
                     // Filter equivalence classes that do not satisfy the column
                     // threshold constraint
@@ -244,7 +244,7 @@ public class EQFileGenerator {
                    mergedTerms,
                    out
            );
-           new TermIndexReader().read(inputFile, consumer);
+           new TermIndexReader(inputFile).read(consumer);
         }
     }
 

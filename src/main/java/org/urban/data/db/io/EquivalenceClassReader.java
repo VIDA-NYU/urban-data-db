@@ -32,13 +32,20 @@ import org.urban.data.db.eq.EquivalenceClassIndex;
  */
 public abstract class EquivalenceClassReader<T extends EquivalenceClass> {
     
+    private File _file;
+    
+    public EquivalenceClassReader(File file) {
+	
+	_file = file;
+    }
+    
     public abstract T equivalenceClassFromString(String[] tokens);
     
-    public void read(File file, EquivalenceClassConsumer<T> consumer, ObjectFilter filter) throws java.io.IOException {
+    public void read(EquivalenceClassConsumer<T> consumer, ObjectFilter filter) throws java.io.IOException {
         
         consumer.open();
         
-        try (BufferedReader in = FileSystem.openReader(file)) {
+        try (BufferedReader in = FileSystem.openReader(_file)) {
 	    String line;
 	    while ((line = in.readLine()) != null) {
 		String[] tokens = line.split("\t");
@@ -52,22 +59,22 @@ public abstract class EquivalenceClassReader<T extends EquivalenceClass> {
         consumer.close();
     }
 
-    public void read(File file, EquivalenceClassConsumer<T> consumer) throws java.io.IOException {
+    public void read(EquivalenceClassConsumer<T> consumer) throws java.io.IOException {
         
-        this.read(file, consumer, new AnyObjectFilter());
+        this.read(consumer, new AnyObjectFilter());
     }
     
-    public EquivalenceClassIndex<T> readIndex(File file) throws java.io.IOException {
+    public EquivalenceClassIndex<T> readIndex() throws java.io.IOException {
         
         EquivalenceClassIndex<T> consumer = new EquivalenceClassIndex<>();
-        this.read(file, consumer);
+        this.read(consumer);
         return consumer;
     }
     
-    public EquivalenceClassIndex<T> readIndex(File file, ObjectFilter filter) throws java.io.IOException {
+    public EquivalenceClassIndex<T> readIndex(ObjectFilter filter) throws java.io.IOException {
         
         EquivalenceClassIndex<T> consumer = new EquivalenceClassIndex<>();
-        this.read(file, consumer, filter);
+        this.read(consumer, filter);
         return consumer;
     }
 }

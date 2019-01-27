@@ -47,7 +47,7 @@ public class EQFileStatsPrinter {
 
 	EquivalenceClassStatsConsumer stats = new EquivalenceClassStatsConsumer();
 	try {
-	    new DefaultEquivalenceClassReader().read(inputFile, stats);
+	    new DefaultEquivalenceClassReader(inputFile).read(stats);
 	} catch (java.io.IOException ex) {
 	    LOGGER.log(Level.SEVERE, inputFile.getName(), ex);
 	    System.exit(-1);
