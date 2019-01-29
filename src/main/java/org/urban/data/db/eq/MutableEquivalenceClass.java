@@ -113,12 +113,14 @@ public class MutableEquivalenceClass extends IdentifiableObjectImpl implements E
         return Integer.compare(this.id(), el.id());
     }
 
-    public void merge(MutableEquivalenceClass node) {
+    public MutableEquivalenceClass merge(MutableEquivalenceClass node) {
     
         _terms.add(node.terms());
         for (IdentifiableCount col : node.columns()) {
             this.add(col);
         }
+        
+        return this;
     }
     
     /**
