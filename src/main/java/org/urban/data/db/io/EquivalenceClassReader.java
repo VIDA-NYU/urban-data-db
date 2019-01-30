@@ -32,7 +32,7 @@ import org.urban.data.db.eq.EquivalenceClassIndex;
  */
 public abstract class EquivalenceClassReader<T extends EquivalenceClass> {
     
-    private File _file;
+    private final File _file;
     
     public EquivalenceClassReader(File file) {
 	
