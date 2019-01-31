@@ -88,10 +88,9 @@ public class MutableEquivalenceClass extends IdentifiableObjectImpl implements E
         
         int id = col.id();
         if (_columns.contains(id)) {
-            int value = _columns.get(id).count() + col.count();
-            _columns.put(new IdentifiableCount(id, value));
+            _columns.get(id).inc(col.count());
         } else {
-            _columns.add(col);
+            _columns.add(new IdentifiableCount(col.id(), col.count()));
         }
     }
 
@@ -138,6 +137,19 @@ public class MutableEquivalenceClass extends IdentifiableObjectImpl implements E
             return count;
         } else {
             return 0;
+        }
+    }
+    
+    public void removeEmptyColumns() {
+        
+        HashIDSet remove = new HashIDSet();
+        for (IdentifiableCount col : _columns) {
+            if (col.count() == 0) {
+                remove.add(col.id());
+            }
+        }
+        for (int colId : remove) {
+            _columns.remove(colId);
         }
     }
     
