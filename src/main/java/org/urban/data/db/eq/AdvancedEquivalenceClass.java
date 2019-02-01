@@ -15,6 +15,7 @@
  */
 package org.urban.data.db.eq;
 
+import org.urban.data.core.set.HashIDSet;
 import org.urban.data.core.util.count.IdentifiableCount;
 import org.urban.data.core.set.IDSet;
 import org.urban.data.core.set.ImmutableObjectSet;
@@ -57,5 +58,16 @@ public class AdvancedEquivalenceClass extends ImmutableEquivalenceClass {
     public IDSet terms() {
         
         return _terms;
+    }
+    
+    public static IDSet union(Iterable<AdvancedEquivalenceClass> nodes) {
+        
+        HashIDSet terms = new HashIDSet();
+        
+        for (AdvancedEquivalenceClass node : nodes) {
+            terms.add(node.terms());
+        }
+        
+        return terms;
     }
 }
