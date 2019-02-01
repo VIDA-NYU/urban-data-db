@@ -20,6 +20,7 @@ import org.urban.data.core.util.count.IdentifiableCount;
 import org.urban.data.core.object.IdentifiableObjectImpl;
 import org.urban.data.core.set.HashIDSet;
 import org.urban.data.core.set.HashObjectSet;
+import org.urban.data.core.set.IDSet;
 import org.urban.data.core.set.IdentifiableObjectSet;
 import org.urban.data.db.column.ColumnElement;
 import org.urban.data.db.column.ColumnElementHelper;
@@ -88,9 +89,10 @@ public class MutableEquivalenceClass extends IdentifiableObjectImpl implements E
         
         int id = col.id();
         if (_columns.contains(id)) {
-            _columns.get(id).inc(col.count());
+            int value = _columns.get(id).count() + col.count();
+	    _columns.put(new IdentifiableCount(id, value));
         } else {
-            _columns.add(new IdentifiableCount(col.id(), col.count()));
+            _columns.add(new IdentifiableCount(id, col.count()));
         }
     }
 
@@ -140,15 +142,9 @@ public class MutableEquivalenceClass extends IdentifiableObjectImpl implements E
         }
     }
     
-    public void removeEmptyColumns() {
+    public void remove(IDSet columns) {
         
-        HashIDSet remove = new HashIDSet();
-        for (IdentifiableCount col : _columns) {
-            if (col.count() == 0) {
-                remove.add(col.id());
-            }
-        }
-        for (int colId : remove) {
+        for (int colId : columns) {
             _columns.remove(colId);
         }
     }
