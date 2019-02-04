@@ -28,7 +28,7 @@ import org.urban.data.core.set.HashObjectSet;
 import org.urban.data.core.set.IDSet;
 import org.urban.data.core.set.IdentifiableIDSet;
 import org.urban.data.core.set.IdentifiableObjectSet;
-import org.urban.data.core.set.ImmutableIdentifiableIDSet;
+import org.urban.data.core.set.SimpleIdentifiableIDSet;
 import org.urban.data.core.util.count.Counter;
 import org.urban.data.core.util.count.IdentifiableCount;
 import org.urban.data.db.column.ColumnElementHelper;
@@ -147,7 +147,7 @@ public class EQFileGenerator {
             _groups = new HashObjectSet<>();
             for (IDSet group : groups) {
                 int eqId = _groups.length();
-                _groups.add(new ImmutableIdentifiableIDSet(eqId, group));
+                _groups.add(new SimpleIdentifiableIDSet(eqId, group));
                 for (int termId : group) {
                     _termIndex.put(termId, eqId);
                 }

@@ -15,7 +15,7 @@
  */
 package org.urban.data.db.term;
 
-import org.urban.data.core.set.IDSet;
+import org.urban.data.core.set.ImmutableIDSet;
 import org.urban.data.core.set.ImmutableIdentifiableIDSet;
 
 /**
@@ -28,7 +28,7 @@ import org.urban.data.core.set.ImmutableIdentifiableIDSet;
  */
 public class TermSet extends ImmutableIdentifiableIDSet implements TermSetMeta {
 
-    public TermSet(int id, IDSet values) {
+    public TermSet(int id, ImmutableIDSet values) {
         
         super(id, values);
     }
