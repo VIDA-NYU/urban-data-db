@@ -17,12 +17,19 @@ package org.urban.data.db.io;
 
 import java.io.BufferedReader;
 import java.io.File;
+import org.apache.commons.lang3.StringUtils;
 import org.urban.data.core.object.filter.AnyObjectFilter;
 import org.urban.data.core.object.filter.ObjectFilter;
 import org.urban.data.core.io.FileSystem;
+import org.urban.data.core.set.HashObjectSet;
+import org.urban.data.core.set.IdentifiableObjectSet;
+import org.urban.data.core.set.ImmutableIDSet;
 import org.urban.data.db.eq.EquivalenceClass;
 import org.urban.data.db.eq.EquivalenceClassConsumer;
 import org.urban.data.db.eq.EquivalenceClassIndex;
+import org.urban.data.db.term.TermSet;
+import org.urban.data.db.term.TermSetMeta;
+import org.urban.data.db.term.TermSetMetaImpl;
 
 /**
  * Read a term index file as a stream. Passes each term to a TermStreamHandler.
@@ -76,5 +83,38 @@ public abstract class EquivalenceClassReader<T extends EquivalenceClass> {
         EquivalenceClassIndex<T> consumer = new EquivalenceClassIndex<>();
         this.read(consumer, filter);
         return consumer;
+    }
+
+    public IdentifiableObjectSet<TermSetMeta> readMeta() throws java.io.IOException {
+
+        HashObjectSet<TermSetMeta> result = new HashObjectSet<>();
+        
+        try (BufferedReader in = FileSystem.openReader(_file)) {
+	    String line;
+	    while ((line = in.readLine()) != null) {
+		String[] tokens = line.split("\t");
+                int eqId = Integer.parseInt(tokens[0]);
+                int termCount = StringUtils.countMatches(tokens[1], ",") + 1;
+                result.add(new TermSetMetaImpl(eqId, termCount));
+            }
+        }
+        
+        return result;
+    }
+
+    public IdentifiableObjectSet<TermSet> readTermSets() throws java.io.IOException {
+
+        HashObjectSet<TermSet> result = new HashObjectSet<>();
+        
+        try (BufferedReader in = FileSystem.openReader(_file)) {
+	    String line;
+	    while ((line = in.readLine()) != null) {
+		String[] tokens = line.split("\t");
+                int eqId = Integer.parseInt(tokens[0]);
+                result.add(new TermSet(eqId, new ImmutableIDSet(tokens[1])));
+            }
+        }
+        
+        return result;
     }
 }
