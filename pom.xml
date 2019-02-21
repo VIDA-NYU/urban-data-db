@@ -43,7 +43,7 @@
                    <archive>
                       <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>org.urban.data.db.term.TermGroupByWriter</mainClass>
+                            <mainClass>org.urban.data.db.eq.EQClassFilter</mainClass>
                       </manifest>
                    </archive>
                 </configuration>

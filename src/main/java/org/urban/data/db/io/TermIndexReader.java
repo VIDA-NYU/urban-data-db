@@ -18,8 +18,13 @@ package org.urban.data.db.io;
 import java.io.BufferedReader;
 import java.io.File;
 import org.urban.data.core.io.FileSystem;
+import org.urban.data.core.object.filter.AnyObjectFilter;
+import org.urban.data.core.object.filter.ObjectFilter;
+import org.urban.data.core.set.EntitySet;
+import org.urban.data.core.set.IdentifiableObjectSet;
 import org.urban.data.core.value.profiling.types.ValueTypeFactory;
 import org.urban.data.db.term.ColumnTerm;
+import org.urban.data.db.term.ColumnTermFilter;
 import org.urban.data.db.term.TermConsumer;
 
 /**
@@ -58,5 +63,24 @@ public class TermIndexReader {
         }
         
         consumer.close();
+    }
+    
+    public EntitySet readEntities(ObjectFilter<Integer> filter) throws java.io.IOException {
+        
+        return new EntitySet(_file, filter);
+    }
+    
+    public IdentifiableObjectSet<ColumnTerm> readTerms(ObjectFilter<Integer> filter) throws java.io.IOException {
+        
+        ColumnTermFilter consumer = new ColumnTermFilter(filter);
+        
+        this.read(consumer);
+        
+        return consumer.terms();
+    }
+    
+    public IdentifiableObjectSet<ColumnTerm> readTerms(File file) throws java.io.IOException {
+        
+        return this.readTerms(new AnyObjectFilter());
     }
 }

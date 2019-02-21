@@ -38,7 +38,7 @@ public class Database implements Iterable<Column> {
     
     private class ColumnBuilder implements TermConsumer {
 
-	private MutableObjectSet<Column> _columns;
+	private final MutableObjectSet<Column> _columns;
 	
 	public ColumnBuilder(MutableObjectSet<Column> columns) {
 	    
