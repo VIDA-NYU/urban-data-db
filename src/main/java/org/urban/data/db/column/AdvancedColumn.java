@@ -40,6 +40,14 @@ public class AdvancedColumn extends IdentifiableObjectImpl {
         _terms = AdvancedEquivalenceClass.union(_nodes);
     }
     
+    public AdvancedColumn(int id,IdentifiableObjectSet<AdvancedEquivalenceClass> nodes) {
+        
+        super(id);
+        
+        _nodes = nodes;
+        _terms = AdvancedEquivalenceClass.union(_nodes);
+    }
+    
     public IdentifiableObjectSet<AdvancedEquivalenceClass> nodes() {
         
         return _nodes;

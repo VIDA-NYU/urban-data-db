@@ -16,7 +16,7 @@
 package org.urban.data.db.column;
 
 import java.io.File;
-import org.urban.data.db.eq.AdvancedEquivalenceClass;
+import org.urban.data.core.set.IdentifiableObjectSet;
 import org.urban.data.db.io.AdvancedEquivalenceClassReader;
 
 /**
@@ -24,10 +24,18 @@ import org.urban.data.db.io.AdvancedEquivalenceClassReader;
  * 
  * @author Heiko Mueller <heiko.mueller@nyu.edu>
  */
-public class AdvancedColumnReader extends ColumnReader<AdvancedEquivalenceClass> {
+public class AdvancedColumnReader {
+    
+    private final File _file;
     
     public AdvancedColumnReader(File file) {
+
+        _file = file;
+    }
+    
+    public IdentifiableObjectSet<AdvancedColumn> read() throws java.io.IOException {
         
-        super(new AdvancedEquivalenceClassReader(file));
+        new AdvancedEquivalenceClassReader(_file);
+        return null;
     }
 }
