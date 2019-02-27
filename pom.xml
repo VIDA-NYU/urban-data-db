@@ -43,7 +43,7 @@
                    <archive>
                       <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>org.urban.data.db.eq.EQClassFilter</mainClass>
+                            <mainClass>org.urban.data.db.column.ColumnFilesGenerator</mainClass>
                       </manifest>
                    </archive>
                 </configuration>

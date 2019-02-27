@@ -25,7 +25,6 @@ import java.io.PrintWriter;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,8 +35,6 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.urban.data.core.value.ValueSet;
 import org.urban.data.core.util.count.Counter;
 import org.urban.data.core.value.AnySetFilter;
-import org.urban.data.core.value.ShortValueSetFilter;
-import org.urban.data.core.value.TextValueSetFilter;
 import org.urban.data.core.value.ValueSetFilter;
 import org.urban.data.core.io.FileSystem;
 
@@ -61,17 +58,12 @@ import org.urban.data.core.io.FileSystem;
  */
 public class ColumnFilesGenerator {
     
-    private final static Logger LOGGER = Logger.getLogger(ColumnFilesGenerator.class.getName());
-    
     private final static String COMMAND =
             "Usage:\n" +
             "  <input-directory>\n" +
             "  <columns-file>\n" +
             "  <to-upper>\n" +
-            "  <max-value-length> [-1 to ignore]\n" +
-            "  <max-value-length-fraction-threshold>\n" +
-            "  <text-column-only>\n" +
-            "  <text-fraction-threshold>\n" +
+            "  <remove-punctuation>\n" +
             "  <output-directory>";
 
     public void run(
@@ -102,12 +94,10 @@ public class ColumnFilesGenerator {
                 files.add(file);
             }
         }
-        Collections.sort(files, new Comparator<File>(){
-            @Override
-            public int compare(File f1, File f2) {
-                return Long.compare(f1.length(), f2.length());
-            }
-        });
+        Collections.sort(
+                files,
+                (File f1, File f2) -> Long.compare(f1.length(), f2.length())
+        );
         Collections.reverse(files);
         
 	/*
@@ -181,9 +171,6 @@ public class ColumnFilesGenerator {
                             columnsWritten++;
                         }
                     }
-                } catch (java.io.IOException exIn) {
-                    LOGGER.log(Level.SEVERE, file.getName(), exIn);
-                    System.exit(-1);
                 }
             }
             out.endArray().endObject();
@@ -249,50 +236,28 @@ public class ColumnFilesGenerator {
 
     public static void main(String[] args) {
 	
-	if (args.length != 9) {
+	if (args.length != 5) {
 	    System.out.println(COMMAND);
-            System.out.println("Given arguments:");
-            for (int iArg = 0; iArg < args.length; iArg++) {
-                System.out.println("  " + iArg + ": " + args[iArg]);
-            }
 	    System.exit(-1);
 	}
 	
 	File inputDir = new File(args[0]);
         File columnsFile = new File(args[1]);
 	boolean toUpper = Boolean.parseBoolean(args[2]);
-	boolean removePunctuation = Boolean.parseBoolean(args[3]);
-        int maxValueLength = Integer.parseInt(args[4]);
-        double lengthFilterThreshold = Double.parseDouble(args[5]);
-        boolean textOnly = Boolean.parseBoolean(args[6]);
-        double textFilterThreshold = Double.parseDouble(args[7]);
-	File outputDir =  new File(args[8]);
+        boolean removePunctuation = Boolean.parseBoolean(args[3]);
+	File outputDir =  new File(args[4]);
 
-        ValueSetFilter filter;
-        if (textOnly) {
-            filter = new TextValueSetFilter(textFilterThreshold);
-        } else {
-            filter = new AnySetFilter();
-        }
-        if (maxValueLength > 0) {
-            filter = new ShortValueSetFilter(
-                    maxValueLength,
-                    lengthFilterThreshold,
-                    filter
-            );
-        }
-        
         try {
             new ColumnFilesGenerator().run(
                     inputDir,
                     toUpper,
                     removePunctuation,
-                    filter,
+                    new AnySetFilter(),
                     columnsFile,
                     outputDir
             );
         } catch (java.io.IOException ex) {
-            LOGGER.log(Level.SEVERE, "CREATE COLUMN FILES", ex);
+            Logger.getGlobal().log(Level.SEVERE, "RUN", ex);
             System.exit(-1);
         }
     }

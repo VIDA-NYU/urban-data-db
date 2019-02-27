@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 New York University.
+ * Copyright 2019 New York University.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,26 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.urban.data.db.io;
+package org.urban.data.db.column;
 
-import java.io.File;
+import org.urban.data.core.value.profiling.types.DataTypeLabel;
 
 /**
- *
+ * Interface to count the number of values of a given type in a column. Allows
+ * to check whether a given constraint regarding the minimum fraction of values
+ * of a given type in a column is satisfied.
+ * 
  * @author Heiko Mueller <heiko.mueller@nyu.edu>
  */
-public abstract class ColumnReaderFactory {
+public interface ColumnTypeConstraint {
     
-    public final int getColumnId(File file) {
-        
-        String[] tokens = file.getName().split("\\.");
-        try {
-            return Integer.parseInt(tokens[0]);
-        } catch (java.lang.NumberFormatException ex) {
-        }
-        return Integer.parseInt(tokens[2]);
-    }
-    
-    public abstract boolean hasNext();
-    public abstract ColumnReader next();
+    public void consume(DataTypeLabel type);
+
+    public boolean isSatisfied();
+
+    public void reset();
 }

@@ -269,7 +269,7 @@ public class EQFileGenerator {
 	int columnThreshold = Integer.parseInt(args[1]);
         boolean observeFrequencies = Boolean.parseBoolean(args[2]);
         boolean mergeTerms = Boolean.parseBoolean(args[3]);
-        File outputFile = new File(args[3]);     
+        File outputFile = new File(args[4]);     
         
         try {
             new EQFileGenerator().run(

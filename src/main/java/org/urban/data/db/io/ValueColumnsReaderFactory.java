@@ -17,29 +17,27 @@ package org.urban.data.db.io;
 
 import java.io.File;
 import java.util.LinkedList;
-import org.urban.data.core.set.IDSet;
+import org.urban.data.core.object.filter.AnyObjectFilter;
+import org.urban.data.core.object.filter.ObjectFilter;
+import org.urban.data.core.value.ValueCounter;
 
 /**
- *
+ * Reader factory for column files. Uses the flexible column reader.
+ * 
  * @author Heiko Mueller <heiko.mueller@nyu.edu>
  */
 public class ValueColumnsReaderFactory extends ColumnReaderFactory {
 
     private final LinkedList<File> _files;
     
-    public ValueColumnsReaderFactory(File directory) {
+    public ValueColumnsReaderFactory(File directory, ObjectFilter<Integer> filter) {
 	
-	_files = new LinkedList<>();
-	
-	for (File file : directory.listFiles()) {
-	    if ((file.getName().endsWith(".txt")) || (file.getName().endsWith(".txt.gz"))) {
-		_files.add(file);
-	    }
-	}
-    }
-    
-    public ValueColumnsReaderFactory(File directory, IDSet filter) {
-	
+        if (!directory.exists()) {
+            throw new IllegalArgumentException("Directory " + directory.getAbsolutePath() + " does not exist");
+        } else if (!directory.isDirectory()) {
+            throw new IllegalArgumentException(directory.getAbsolutePath() + " not a directory");
+        }
+        
 	_files = new LinkedList<>();
 	
 	for (File file : directory.listFiles()) {
@@ -52,6 +50,11 @@ public class ValueColumnsReaderFactory extends ColumnReaderFactory {
 	}
     }
     
+    public ValueColumnsReaderFactory(File directory) {
+	
+        this(directory, new AnyObjectFilter<Integer>());
+    }
+    
     @Override
     public boolean hasNext() {
 
@@ -59,7 +62,7 @@ public class ValueColumnsReaderFactory extends ColumnReaderFactory {
     }
 
     @Override
-    public ColumnReader next() {
+    public ColumnReader<ValueCounter> next() {
 
 	File file = _files.pop();
 	int columnId = this.getColumnId(file);
