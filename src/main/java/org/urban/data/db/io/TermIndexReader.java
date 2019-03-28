@@ -79,7 +79,7 @@ public class TermIndexReader {
         return consumer.terms();
     }
     
-    public IdentifiableObjectSet<ColumnTerm> readTerms(File file) throws java.io.IOException {
+    public IdentifiableObjectSet<ColumnTerm> readTerms() throws java.io.IOException {
         
         return this.readTerms(new AnyObjectFilter());
     }

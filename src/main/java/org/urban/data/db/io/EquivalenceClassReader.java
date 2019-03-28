@@ -102,7 +102,7 @@ public abstract class EquivalenceClassReader<T extends EquivalenceClass> {
         return result;
     }
 
-    public IdentifiableObjectSet<TermSet> readTermSets() throws java.io.IOException {
+    public IdentifiableObjectSet<TermSet> readTermSets(ObjectFilter filter) throws java.io.IOException {
 
         HashObjectSet<TermSet> result = new HashObjectSet<>();
         
@@ -111,10 +111,17 @@ public abstract class EquivalenceClassReader<T extends EquivalenceClass> {
 	    while ((line = in.readLine()) != null) {
 		String[] tokens = line.split("\t");
                 int eqId = Integer.parseInt(tokens[0]);
-                result.add(new TermSet(eqId, new ImmutableIDSet(tokens[1])));
+                if (filter.contains(eqId)) {
+                    result.add(new TermSet(eqId, new ImmutableIDSet(tokens[1])));
+                }
             }
         }
         
         return result;
+    }
+
+    public IdentifiableObjectSet<TermSet> readTermSets() throws java.io.IOException {
+        
+        return this.readTermSets(new AnyObjectFilter());
     }
 }
