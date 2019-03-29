@@ -90,9 +90,9 @@ public abstract class EquivalenceClassReader<T extends EquivalenceClass> {
         HashObjectSet<TermSetMeta> result = new HashObjectSet<>();
         
         try (BufferedReader in = FileSystem.openReader(_file)) {
-	    String line;
-	    while ((line = in.readLine()) != null) {
-		String[] tokens = line.split("\t");
+            String line;
+            while ((line = in.readLine()) != null) {
+            String[] tokens = line.split("\t");
                 int eqId = Integer.parseInt(tokens[0]);
                 int termCount = StringUtils.countMatches(tokens[1], ",") + 1;
                 result.add(new TermSetMetaImpl(eqId, termCount));
@@ -107,9 +107,9 @@ public abstract class EquivalenceClassReader<T extends EquivalenceClass> {
         HashObjectSet<TermSet> result = new HashObjectSet<>();
         
         try (BufferedReader in = FileSystem.openReader(_file)) {
-	    String line;
-	    while ((line = in.readLine()) != null) {
-		String[] tokens = line.split("\t");
+            String line;
+            while ((line = in.readLine()) != null) {
+            String[] tokens = line.split("\t");
                 int eqId = Integer.parseInt(tokens[0]);
                 if (filter.contains(eqId)) {
                     result.add(new TermSet(eqId, new ImmutableIDSet(tokens[1])));

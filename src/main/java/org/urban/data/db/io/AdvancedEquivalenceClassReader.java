@@ -27,7 +27,7 @@ public class AdvancedEquivalenceClassReader extends EquivalenceClassReader<Advan
 
     public AdvancedEquivalenceClassReader(File file) {
 	
-	super(file);
+        super(file);
     }
     
     @Override
