@@ -15,6 +15,7 @@
  */
 package org.urban.data.db.term;
 
+import org.urban.data.core.object.NamedObject;
 import org.urban.data.core.util.count.IdentifiableCount;
 import org.urban.data.core.set.ImmutableObjectSet;
 import org.urban.data.core.value.profiling.types.DataTypeLabel;
@@ -25,7 +26,7 @@ import org.urban.data.db.column.ImmutableColumnElement;
  *
  * @author Heiko Mueller <heiko.mueller@nyu.edu>
  */
-public class ColumnTerm extends ImmutableColumnElement {
+public class ColumnTerm extends ImmutableColumnElement implements NamedObject {
     
     private final String _term;
     private final DataTypeLabel _type;
@@ -61,6 +62,12 @@ public class ColumnTerm extends ImmutableColumnElement {
             String columnCounts
     ) {
         this(id, term, type, ColumnElementHelper.fromStringArray(columnCounts));
+    }
+    
+    @Override
+    public String name() {
+        
+        return _term;
     }
     
     /**
