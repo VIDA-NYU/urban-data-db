@@ -15,86 +15,51 @@
  */
 package org.urban.data.db.column;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.util.List;
-import org.urban.data.core.graph.components.UndirectedConnectedComponents;
-import org.urban.data.core.io.FileSystem;
-import org.urban.data.core.set.HashObjectSet;
-import org.urban.data.core.set.IdentifiableIDSet;
-import org.urban.data.core.set.IdentifiableObjectSet;
-import org.urban.data.core.set.ObjectCollection;
+import org.urban.data.core.object.IdentifiableObjectImpl;
+import org.urban.data.core.set.IDSet;
+import org.urban.data.core.set.ImmutableIDSet;
 
 /**
- * Methods for grouping and reading sets of expanded columns from file.
+ * Group of identical expanded columns.
  * 
  * The expansion set can be empty.
  * 
  * @author Heiko Mueller <heiko.mueller@nyu.edu>
  */
-public class ExpandedColumnSet {
+public class ExpandedColumnSet extends IdentifiableObjectImpl {
     
-    public IdentifiableObjectSet<ObjectCollection<ExpandedColumn>> group(
-            IdentifiableObjectSet<ExpandedColumn> columns
-    ) {
-        HashObjectSet<ObjectCollection<ExpandedColumn>> result;
-        result = new HashObjectSet<>();
+    private final IDSet _columns;
+    private final ImmutableIDSet _expansion;
+    private final ImmutableIDSet _fullNodeSet;
+    private final ImmutableIDSet _nodes;
+    
+    public ExpandedColumnSet(IDSet columns, ImmutableIDSet nodes, ImmutableIDSet expansion) {
         
-        UndirectedConnectedComponents compGen;
-        compGen = new UndirectedConnectedComponents(columns.keys());
-        for (ExpandedColumn colI : columns) {
-            for (ExpandedColumn colJ : columns) {
-                if (colI.id() < colJ.id()) {
-                    if (colI.expandedNodeSet().sameSetAs(colJ.expandedNodeSet())) {
-                        compGen.edge(colI.id(), colJ.id());
-                    }
-                }
-            }
-        }
+        super(columns.first());
         
-        for (IdentifiableIDSet comp : compGen.getComponents()) {
-            ObjectCollection<ExpandedColumn> group;
-            group = new ObjectCollection<>(comp.first());
-            for (int columnId : comp) {
-                group.add(columns.get(columnId));
-            }
-            result.add(group);
-        }
-        
-        return result;
+        _columns = columns;
+        _nodes = nodes;
+        _expansion = expansion;
+        _fullNodeSet = _nodes.union(_expansion);
     }
-
-    public IdentifiableObjectSet<ObjectCollection<ExpandedColumn>> group(
-            File file
-    ) throws java.io.IOException {
+    
+    public IDSet columns() {
         
-        return this.group(read(file));
+        return _columns;
     }
-
-    public IdentifiableObjectSet<ObjectCollection<ExpandedColumn>> groupColumns(
-            List<Column> columns
-    ) throws java.io.IOException {
+    
+    public ImmutableIDSet expansion() {
         
-        HashObjectSet<ExpandedColumn> expandedColumns;
-        expandedColumns = new HashObjectSet<>();
-        for (Column column : columns) {
-            expandedColumns.add(new ExpandedColumn(column.id(), column));
-        }
-        return group(expandedColumns);
+        return _expansion;
     }
-
-    public IdentifiableObjectSet<ExpandedColumn> read(
-            File file
-    ) throws java.io.IOException {
-
-        HashObjectSet<ExpandedColumn> columns;
-	columns = new HashObjectSet<>();
-        try (BufferedReader in = FileSystem.openReader(file)) {
-	    String line;
-	    while ((line = in.readLine()) != null) {
-		columns.add(ExpandedColumn.parse(line));
-	    }
-	}
-        return columns;
+    
+    public ImmutableIDSet expandedNodeSet() {
+        
+        return _fullNodeSet;
+    }
+    
+    public ImmutableIDSet nodes() {
+        
+        return _nodes;
     }
 }
