@@ -15,8 +15,11 @@
  */
 package org.urban.data.db.column;
 
+import org.urban.data.core.set.HashIDSet;
 import org.urban.data.core.set.IDSet;
+import org.urban.data.core.set.IdentifiableObjectSet;
 import org.urban.data.core.set.MutableIdentifiableIDSet;
+import org.urban.data.db.eq.EQ;
 
 /**
  *
@@ -32,5 +35,23 @@ public class Column extends MutableIdentifiableIDSet {
     public Column(int id, IDSet values) {
         
         super(id, values);
+    }
+    
+    public <T extends EQ> int termCount(IdentifiableObjectSet<T> nodes) {
+        
+        int count = 0;
+        for (int nodeId : this) {
+            count += nodes.get(nodeId).terms().length();
+        }
+        return count;
+    }
+    
+    public <T extends EQ> IDSet terms(IdentifiableObjectSet<T> nodes) {
+        
+        HashIDSet terms = new HashIDSet();
+        for (int nodeId : this) {
+            terms.add(nodes.get(nodeId).terms());
+        }
+        return terms;
     }
 }

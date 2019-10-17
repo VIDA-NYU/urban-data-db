@@ -15,92 +15,58 @@
  */
 package org.urban.data.db;
 
+import java.io.File;
 import java.util.Iterator;
 import org.urban.data.core.set.HashIDSet;
 import org.urban.data.core.set.HashObjectSet;
 import org.urban.data.core.set.IDSet;
 import org.urban.data.core.set.IdentifiableObjectSet;
-import org.urban.data.core.set.MutableObjectSet;
-import org.urban.data.core.util.count.IdentifiableCount;
 import org.urban.data.db.column.Column;
-import org.urban.data.db.column.ColumnElement;
-import org.urban.data.db.eq.EquivalenceClass;
-import org.urban.data.db.io.EquivalenceClassReader;
-import org.urban.data.db.io.TermIndexReader;
-import org.urban.data.db.term.ColumnTerm;
-import org.urban.data.db.term.TermConsumer;
+import org.urban.data.db.eq.EQ;
+import org.urban.data.db.eq.EQReader;
+import org.urban.data.db.term.TermIndexReader;
 
 /**
- *
+ * A database is a set of columns. Each columns contains a list of node
+ * identifier.
+ * 
  * @author Heiko Mueller <heiko.mueller@nyu.edu>
  */
 public class Database implements Iterable<Column> {
     
-    private class ColumnBuilder implements TermConsumer {
-
-	private final MutableObjectSet<Column> _columns;
-	
-	public ColumnBuilder(MutableObjectSet<Column> columns) {
-	    
-	    _columns = columns;
-	}
-	
-	@Override
-	public void close() {
-	    
-	}
-
-	@Override
-	public void consume(ColumnTerm term) {
-	    
-	    for (IdentifiableCount col : term.columns()) {
-		Column column;
-		if (_columns.contains(col.id())) {
-		    column = _columns.get(col.id());
-		} else {
-		    column = new Column(col.id());
-		    _columns.add(column);
-		}
-		column.add(term.id());
-	    }
-	}
-
-	@Override
-	public void open() {
-	    
-	}
-    }
+    private final HashObjectSet<Column> _columns;
     
-    private final MutableObjectSet<Column> _columns;
-    
-    public <T extends ColumnElement<IdentifiableCount>> Database(Iterable<T> nodes) {
+    public <T extends EQ> Database(Iterable<T> nodes) {
         
         _columns = new HashObjectSet<>();
         
         for (T node : nodes) {
-            for (IdentifiableCount col : node.columns()) {
+            for (int columnId : node.columns()) {
                 Column column;
-                if (!_columns.contains(col.id())) {
-                    column = new Column(col.id());
+                if (!_columns.contains(columnId)) {
+                    column = new Column(columnId);
                     _columns.add(column);
                 } else {
-                    column = _columns.get(col.id());
+                    column = _columns.get(columnId);
                 }
                 column.add(node.id());
             }
         }
     }
     
-    public <T extends EquivalenceClass> Database(EquivalenceClassReader<T> reader) throws java.io.IOException {
+    public Database(EQReader reader) throws java.io.IOException {
 	
-	this(reader.readIndex());
+        this(reader.read());
     }
     
     public Database(TermIndexReader reader) throws java.io.IOException {
 	
-        _columns = new HashObjectSet<>();
-	
-	reader.read(new ColumnBuilder(_columns));
+        this(reader.read());
+    }
+    
+    public Database(File file) throws java.io.IOException {
+        
+        this(new EQReader(file));
     }
     
     public IDSet columnIds() {

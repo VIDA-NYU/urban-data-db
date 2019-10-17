@@ -15,25 +15,26 @@
  */
 package org.urban.data.db.term;
 
+import org.urban.data.core.object.filter.ObjectFilter;
 import org.urban.data.core.set.HashObjectSet;
 import org.urban.data.core.set.IdentifiableObjectSet;
-import org.urban.data.core.set.StringSet;
 
 /**
- * Find matching terms for a given set of values.
+ * Term consumer to filter a set of database terms.
  * 
  * @author Heiko Mueller <heiko.mueller@nyu.edu>
  */
-public class TermFinder implements TermConsumer {
+public class TermBuffer implements TermConsumer {
+    
+    private final ObjectFilter _filter;
+    private final HashObjectSet<Term> _terms;
 
-    private HashObjectSet<Term> _terms = null;
-    private final StringSet _values;
-    
-    public TermFinder(StringSet values) {
-        
-        _values = values;
+    public TermBuffer(ObjectFilter filter) {
+
+        _filter = filter;
+        _terms = new HashObjectSet();
     }
-    
+
     @Override
     public void close() {
 
@@ -42,7 +43,7 @@ public class TermFinder implements TermConsumer {
     @Override
     public void consume(Term term) {
 
-        if (_values.contains(term.name())) {
+        if (_filter.contains(term.id())) {
             _terms.add(term);
         }
     }
@@ -50,11 +51,10 @@ public class TermFinder implements TermConsumer {
     @Override
     public void open() {
 
-        _terms = new HashObjectSet<>();
     }
-    
+
     public IdentifiableObjectSet<Term> terms() {
-        
+
         return _terms;
     }
 }

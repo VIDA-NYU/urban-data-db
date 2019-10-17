@@ -43,7 +43,7 @@
                    <archive>
                       <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>org.urban.data.db.column.ColumnFilesGenerator</mainClass>
+                            <mainClass>org.urban.data.db.eq.SimIndex</mainClass>
                       </manifest>
                    </archive>
                 </configuration>

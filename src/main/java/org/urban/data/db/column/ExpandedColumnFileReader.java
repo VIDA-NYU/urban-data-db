@@ -13,48 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.urban.data.db.term;
+package org.urban.data.db.column;
 
+import java.io.BufferedReader;
+import java.io.File;
+import org.urban.data.core.io.FileSystem;
 import org.urban.data.core.set.HashObjectSet;
 import org.urban.data.core.set.IdentifiableObjectSet;
-import org.urban.data.core.set.StringSet;
+import org.urban.data.db.column.ExpandedColumn;
 
 /**
- * Find matching terms for a given set of values.
+ * Read a set of expanded column from file.
  * 
  * @author Heiko Mueller <heiko.mueller@nyu.edu>
  */
-public class TermFinder implements TermConsumer {
-
-    private HashObjectSet<Term> _terms = null;
-    private final StringSet _values;
+public class ExpandedColumnFileReader {
     
-    public TermFinder(StringSet values) {
+    private final File _file;
+    
+    public ExpandedColumnFileReader(File file) {
         
-        _values = values;
+        _file = file;
     }
     
-    @Override
-    public void close() {
+    public IdentifiableObjectSet<ExpandedColumn> read() throws java.io.IOException {
 
-    }
-
-    @Override
-    public void consume(Term term) {
-
-        if (_values.contains(term.name())) {
-            _terms.add(term);
-        }
-    }
-
-    @Override
-    public void open() {
-
-        _terms = new HashObjectSet<>();
-    }
-    
-    public IdentifiableObjectSet<Term> terms() {
+        HashObjectSet<ExpandedColumn> columns;
+	columns = new HashObjectSet<>();
+        try (BufferedReader in = FileSystem.openReader(_file)) {
+	    String line;
+	    while ((line = in.readLine()) != null) {
+		columns.add(ExpandedColumn.parse(line));
+	    }
+	}
         
-        return _terms;
+        return columns;
     }
+
 }

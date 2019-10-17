@@ -13,52 +13,51 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.urban.data.db.column;
+package org.urban.data.db.term;
 
-import org.urban.data.core.object.IdentifiableObjectImpl;
+import org.urban.data.core.object.Entity;
 import org.urban.data.core.set.IDSet;
+import org.urban.data.core.set.ImmutableIDSet;
+import org.urban.data.core.value.profiling.types.DataTypeLabel;
+import org.urban.data.core.value.profiling.types.DefaultDataTypeAnnotator;
+import org.urban.data.db.eq.EQ;
 
 /**
- * Group of identical expanded columns.
- * 
- * The expansion set can be empty.
+ * A term in a database. Each term has a unique identifier and a unique name.
+ * The database term also has a list of columns that contain the term.
  * 
  * @author Heiko Mueller <heiko.mueller@nyu.edu>
  */
-public class ExpandedColumnSet extends IdentifiableObjectImpl {
+public class Term extends Entity implements EQ {
     
     private final IDSet _columns;
-    private final IDSet _expansion;
-    private final IDSet _fullNodeSet;
-    private final IDSet _nodes;
     
-    public ExpandedColumnSet(IDSet columns, IDSet nodes, IDSet expansion) {
+    public Term(int id, String value, IDSet columns) {
         
-        super(columns.first());
+        super(id, value);
         
         _columns = columns;
-        _nodes = nodes;
-        _expansion = expansion;
-        _fullNodeSet = _nodes.union(_expansion);
     }
-    
+
+    @Override
     public IDSet columns() {
         
         return _columns;
     }
-    
-    public IDSet expansion() {
-        
-        return _expansion;
+
+    @Override
+    public IDSet terms() {
+
+        return new ImmutableIDSet(this.id());
     }
-    
-    public IDSet expandedNodeSet() {
+
+    /**
+     * The data type of the term value.
+     * 
+     * @return 
+     */
+    public DataTypeLabel type() {
         
-        return _fullNodeSet;
-    }
-    
-    public IDSet nodes() {
-        
-        return _nodes;
+        return new DefaultDataTypeAnnotator().getType(this.name());
     }
 }

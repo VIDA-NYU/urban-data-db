@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 New York University.
+ * Copyright 2019 New York University.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,16 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.urban.data.db.term;
+package org.urban.data.db.eq;
+
+import org.urban.data.core.object.IdentifiableObject;
+import org.urban.data.core.set.IDSet;
 
 /**
- * Consumer for term set stream reader.
+ * Each equivalence class is a set of terms that always occur together in the
+ * same set of columns.
  * 
  * @author Heiko Mueller <heiko.mueller@nyu.edu>
  */
-public interface TermConsumer {
+public interface EQ extends IdentifiableObject {
+   
+    /**
+     * List of identifier for columns the equivalence class occurs in.
+     * 
+     * @return 
+     */
+    public IDSet columns();
     
-    public void close();
-    public void consume(Term term);
-    public void open();
+    /**
+     * List of identifier for terms in the equivalence class.
+     * 
+     * @return 
+     */
+    public IDSet terms();
 }

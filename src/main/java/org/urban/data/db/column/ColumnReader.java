@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 New York University.
+ * Copyright 2018 New York University.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,37 +15,66 @@
  */
 package org.urban.data.db.column;
 
-import java.util.List;
-import org.urban.data.core.set.HashObjectSet;
-import org.urban.data.core.set.IdentifiableObjectSet;
-import org.urban.data.db.eq.EquivalenceClass;
-import org.urban.data.db.io.EquivalenceClassReader;
+import org.urban.data.core.value.ValueCounter;
 
 /**
- * Read individual columns from an equivalence class file.
+ * Read a stream of column values. The reader needs to be reset before ever
+ * iterations through the data (except for the first one).
  * 
  * @author Heiko Mueller <heiko.mueller@nyu.edu>
  * @param <T>
  */
-public class ColumnReader<T extends EquivalenceClass> {
+public abstract class ColumnReader<T extends ValueCounter> {
     
-    private final EquivalenceClassReader<T> _reader;
+    private final int _columnId;
     
-    public ColumnReader(EquivalenceClassReader<T> reader) {
-        
-        _reader = reader;
+    public ColumnReader(int columnId) {
+	
+	_columnId = columnId;
     }
     
-    public IdentifiableObjectSet<T> get(int columnId) throws java.io.IOException {
-        
-        ColumnFilter consumer = new ColumnFilter(columnId);
-        _reader.read(consumer);
-        
-        List<T> nodes = consumer.nodes();
-        if (!nodes.isEmpty()) {
-            return new HashObjectSet<>(nodes);
-        } else {
-            return null;
-        }
+    /**
+     * Create a copy of the reader. Primarily necessary if multiple threads
+     * want to read a stream in parallel.
+     * 
+     * @return 
+     */
+    public abstract ColumnReader<T> cloneReader();
+    /**
+     * Close the reader.
+     * 
+     */
+    public abstract void close();
+    
+    /**
+     * The unique identifier of the column that is being read.
+     * 
+     * @return 
+     */
+    public int columnId() {
+	
+	return _columnId;
     }
+    
+    /**
+     * Check if the reader has a next value or if the last value has been
+     * reached.
+     * 
+     * @return 
+     */
+    public abstract boolean hasNext();
+
+    /**
+     * Get next value in the stream. Result is null if end of stream has been
+     * reached.
+     * 
+     * @return 
+     */
+    
+    public abstract T next();
+    /**
+     * Reset the reader to the beginning of the stream.
+     * 
+     */
+    public abstract void reset();
 }

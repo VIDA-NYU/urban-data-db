@@ -30,7 +30,7 @@ import org.urban.data.core.set.ImmutableIDSet;
 public class ExpandedColumn extends Column {
     
     private IDSet _expansion;
-    private ImmutableIDSet _fullNodeSet = null;
+    private IDSet _fullNodeSet = null;
     
     public ExpandedColumn(int id, IDSet nodes, IDSet expansion) {
         
@@ -44,12 +44,22 @@ public class ExpandedColumn extends Column {
         this(id, nodes, new HashIDSet());
     }
     
+    public ExpandedColumn(Column column, IDSet expansion) {
+        
+        this(column.id(), column, expansion);
+    }
+    
+    public ExpandedColumn(Column column) {
+        
+        this(column.id(), column, new HashIDSet());
+    }
+    
     public IDSet expansion() {
         
         return _expansion;
     }
     
-    public ImmutableIDSet expandedNodeSet() {
+    public IDSet expandedNodeSet() {
         
         if (_fullNodeSet == null) {
             _fullNodeSet = this.union(_expansion);

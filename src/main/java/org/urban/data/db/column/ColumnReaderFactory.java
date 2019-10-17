@@ -13,16 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.urban.data.db.term;
+package org.urban.data.db.column;
+
+import java.io.File;
 
 /**
- * Consumer for term set stream reader.
- * 
+ *
  * @author Heiko Mueller <heiko.mueller@nyu.edu>
  */
-public interface TermConsumer {
+public abstract class ColumnReaderFactory {
     
-    public void close();
-    public void consume(Term term);
-    public void open();
+    public final int getColumnId(File file) {
+        
+        String[] tokens = file.getName().split("\\.");
+        try {
+            return Integer.parseInt(tokens[0]);
+        } catch (java.lang.NumberFormatException ex) {
+        }
+        return Integer.parseInt(tokens[2]);
+    }
+    
+    public abstract boolean hasNext();
+    public abstract ColumnReader next();
 }

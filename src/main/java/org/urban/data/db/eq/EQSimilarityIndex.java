@@ -13,48 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.urban.data.db.term;
+package org.urban.data.db.eq;
 
+import java.math.BigDecimal;
 import org.urban.data.core.set.HashObjectSet;
-import org.urban.data.core.set.IdentifiableObjectSet;
-import org.urban.data.core.set.StringSet;
+import org.urban.data.core.similarity.JaccardIndex;
 
 /**
- * Find matching terms for a given set of values.
+ * Compute overlap and Jaccard similarity between any pair of equivalence
+ * classes in a database.
  * 
  * @author Heiko Mueller <heiko.mueller@nyu.edu>
  */
-public class TermFinder implements TermConsumer {
-
-    private HashObjectSet<Term> _terms = null;
-    private final StringSet _values;
+public abstract class EQSimilarityIndex extends HashObjectSet<EQ> {
     
-    public TermFinder(StringSet values) {
+    public EQSimilarityIndex(Iterable<EQ> elements) {
         
-        _values = values;
+        super(elements);
     }
     
-    @Override
-    public void close() {
-
-    }
-
-    @Override
-    public void consume(Term term) {
-
-        if (_values.contains(term.name())) {
-            _terms.add(term);
-        }
-    }
-
-    @Override
-    public void open() {
-
-        _terms = new HashObjectSet<>();
-    }
-    
-    public IdentifiableObjectSet<Term> terms() {
+    public BigDecimal getJI(int eqId1, int eqId2) {
         
-        return _terms;
+        return JaccardIndex.ji(
+                this.get(eqId1).columns().length(),
+                this.get(eqId2).columns().length(),
+                this.getOverlap(eqId1, eqId2)
+        );
     }
+    
+    public abstract int getOverlap(int eqId1, int eqId2);
 }
