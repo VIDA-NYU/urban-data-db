@@ -43,7 +43,7 @@
                    <archive>
                       <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>org.urban.data.db.eq.SimIndex</mainClass>
+                            <mainClass>org.urban.data.db.term.TermIndexGenerator</mainClass>
                       </manifest>
                    </archive>
                 </configuration>
