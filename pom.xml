@@ -43,7 +43,7 @@
                    <archive>
                       <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>org.urban.data.db.term.TermIndexGenerator</mainClass>
+                            <mainClass>org.urban.data.db.column.ColumnTypePrinter</mainClass>
                       </manifest>
                    </archive>
                 </configuration>

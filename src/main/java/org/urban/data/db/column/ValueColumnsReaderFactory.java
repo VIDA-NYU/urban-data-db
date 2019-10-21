@@ -27,7 +27,7 @@ import org.urban.data.core.value.ValueCounter;
  * 
  * @author Heiko Mueller <heiko.mueller@nyu.edu>
  */
-public class ValueColumnsReaderFactory extends ColumnReaderFactory {
+public class ValueColumnsReaderFactory implements ColumnReaderFactory {
 
     private final LinkedList<File> _files;
     
@@ -43,7 +43,7 @@ public class ValueColumnsReaderFactory extends ColumnReaderFactory {
 
         for (File file : directory.listFiles()) {
             if ((file.getName().endsWith(".txt")) || (file.getName().endsWith(".txt.gz"))) {
-                    int columnId = this.getColumnId(file);
+                    int columnId = ColumnHelper.getColumnId(file);
                     if (filter.contains(columnId)) {
                         _files.add(file);
                     }
@@ -71,7 +71,7 @@ public class ValueColumnsReaderFactory extends ColumnReaderFactory {
     public ColumnReader<ValueCounter> next() {
 
         File file = _files.pop();
-        int columnId = this.getColumnId(file);
+        int columnId = ColumnHelper.getColumnId(file);
         return new SimpleColumnReader(file, columnId);
     }
 }

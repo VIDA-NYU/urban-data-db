@@ -15,24 +15,12 @@
  */
 package org.urban.data.db.column;
 
-import java.io.File;
-
 /**
  *
  * @author Heiko Mueller <heiko.mueller@nyu.edu>
  */
-public abstract class ColumnReaderFactory {
+public interface ColumnReaderFactory {
     
-    public final int getColumnId(File file) {
-        
-        String[] tokens = file.getName().split("\\.");
-        try {
-            return Integer.parseInt(tokens[0]);
-        } catch (java.lang.NumberFormatException ex) {
-        }
-        return Integer.parseInt(tokens[2]);
-    }
-    
-    public abstract boolean hasNext();
-    public abstract ColumnReader next();
+    public boolean hasNext();
+    public ColumnReader next();
 }

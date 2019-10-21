@@ -70,7 +70,7 @@ public class FlexibleColumnReader extends ColumnReader<ValueCounter> {
 
     public FlexibleColumnReader(File file) {
         
-        this(file, -1, DEFAULT_DELIMITER);
+        this(file, ColumnHelper.getColumnId(file), DEFAULT_DELIMITER);
     }
 
     @Override
