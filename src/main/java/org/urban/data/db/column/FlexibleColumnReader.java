@@ -49,7 +49,7 @@ public class FlexibleColumnReader extends ColumnReader<ValueCounter> {
      */
     public FlexibleColumnReader(File file, int columnId, String delimiter) {
         
-	super(columnId);
+        super(columnId);
 	
         _file = file;
         _delimiter = delimiter;

@@ -17,6 +17,7 @@ package org.urban.data.db.column;
 
 import java.io.File;
 import java.util.LinkedList;
+import java.util.List;
 import org.urban.data.core.object.filter.AnyObjectFilter;
 import org.urban.data.core.object.filter.ObjectFilter;
 import org.urban.data.core.value.ValueCounter;
@@ -38,16 +39,16 @@ public class ValueColumnsReaderFactory extends ColumnReaderFactory {
             throw new IllegalArgumentException(directory.getAbsolutePath() + " not a directory");
         }
         
-	_files = new LinkedList<>();
-	
-	for (File file : directory.listFiles()) {
-	    if ((file.getName().endsWith(".txt")) || (file.getName().endsWith(".txt.gz"))) {
-                int columnId = this.getColumnId(file);
-                if (filter.contains(columnId)) {
-                    _files.add(file);
-                }
-	    }
-	}
+        _files = new LinkedList<>();
+
+        for (File file : directory.listFiles()) {
+            if ((file.getName().endsWith(".txt")) || (file.getName().endsWith(".txt.gz"))) {
+                    int columnId = this.getColumnId(file);
+                    if (filter.contains(columnId)) {
+                        _files.add(file);
+                    }
+            }
+        }
     }
     
     public ValueColumnsReaderFactory(File directory) {
@@ -55,17 +56,22 @@ public class ValueColumnsReaderFactory extends ColumnReaderFactory {
         this(directory, new AnyObjectFilter<Integer>());
     }
     
+    public ValueColumnsReaderFactory(List<File> files) {
+        
+        _files = new LinkedList<>(files);
+    }
+    
     @Override
     public boolean hasNext() {
 
-	return (!_files.isEmpty());
+        return (!_files.isEmpty());
     }
 
     @Override
     public ColumnReader<ValueCounter> next() {
 
-	File file = _files.pop();
-	int columnId = this.getColumnId(file);
-	return new SimpleColumnReader(file, columnId);
+        File file = _files.pop();
+        int columnId = this.getColumnId(file);
+        return new SimpleColumnReader(file, columnId);
     }
 }

@@ -27,18 +27,18 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.urban.data.core.value.profiling.types.DefaultDataTypeAnnotator;
-import org.urban.data.core.value.profiling.types.DataTypeLabel;
-import org.urban.data.core.value.DefaultValueTransformer;
-import org.urban.data.core.util.count.IdentifiableCount;
-import org.urban.data.core.set.HashObjectSet;
-import org.urban.data.core.io.FileSystem;
-import org.urban.data.core.util.MemUsagePrinter;
+import org.urban.data.core.io.FileListReader;
 import org.urban.data.core.value.ValueCounter;
-import org.urban.data.core.value.profiling.types.ValueTypeFactory;
-import org.urban.data.db.column.ColumnElementHelper;
+import org.urban.data.core.profiling.datatype.ValueTypeFactory;
+import org.urban.data.core.value.DefaultValueTransformer;
+import org.urban.data.core.set.HashIDSet;
+import org.urban.data.core.io.FileSystem;
+import org.urban.data.core.set.IDSet;
+import org.urban.data.core.util.MemUsagePrinter;
 import org.urban.data.db.column.ColumnReader;
 import org.urban.data.db.column.ValueColumnsReaderFactory;
 
@@ -51,102 +51,25 @@ import org.urban.data.db.column.ValueColumnsReaderFactory;
  */
 public class TermIndexGenerator {
 
-    private class ColumnValue {
-        
-        private int _count;
-        private final DataTypeLabel _type;
-        
-        public ColumnValue(DataTypeLabel type, int count) {
-            
-            _type = type;
-            _count = count;
-        }
-        
-        public int count() {
-            
-            return _count;
-        }
-        
-        public void inc(int value) {
-            
-            _count += value;
-        }
-        
-        public DataTypeLabel type() {
-            
-            return _type;
-        }
-    }
-    
-    private class IndexValue {
-        
-        private final HashObjectSet<IdentifiableCount> _counts;
-        private final DataTypeLabel _type;
-        
-        public IndexValue(DataTypeLabel type, IdentifiableCount count) {
-            
-            _type = type;
-            
-            _counts = new HashObjectSet<>();
-            _counts.add(count);
-        }
-        
-        public void add(IdentifiableCount column) {
-        
-            if (_counts.contains(column.id())) {
-                throw new IllegalArgumentException("Count for column " + column.id() + " exists");
-            }
-            _counts.add(column);
-        }
-        
-        public HashObjectSet<IdentifiableCount> counts() {
-            
-            return _counts;
-        }
-        
-        
-        public DataTypeLabel type() {
-            
-            return _type;
-        }
-    }
-    
     private class IOTerm {
 
-        private final HashObjectSet<IdentifiableCount> _columns;
+        private final IDSet _columns;
         private final String _term;
-        private final DataTypeLabel _type;
 
-        public IOTerm(
-                String term,
-                DataTypeLabel type,
-                HashObjectSet<IdentifiableCount> columns
-        ) {
+        public IOTerm(String term, IDSet columns) {
+            
             _term = term;
-            _type = type;
             _columns = columns;
         }
 
-        public HashObjectSet<IdentifiableCount> columns() {
+        public IDSet columns() {
 
             return _columns;
         }
         
         public IOTerm merge(IOTerm t) {
             
-            HashObjectSet<IdentifiableCount> columns = new HashObjectSet<>(_columns);
-            
-            for (IdentifiableCount col : t.columns()) {
-                int id = col.id();
-                if (columns.contains(id)) {
-                    int value = columns.get(id).count() + col.count();
-                    columns.put(new IdentifiableCount(id, value));
-                } else {
-                    columns.add(col);
-                }
-            }
-            
-            return new IOTerm(_term, _type, columns);
+            return new IOTerm(_term, _columns.union(t.columns()));
         }
 
         public String term() {
@@ -158,8 +81,7 @@ public class TermIndexGenerator {
 
             out.println(
                     this.term() + "\t" +
-                    _type.id() + "\t" +
-                    ColumnElementHelper.toArrayString(_columns.toList())
+                    _columns.toIntString()
             );
         }
     }
@@ -247,14 +169,9 @@ public class TermIndexGenerator {
             String line = _in.readLine();
             if (line != null) {
                 String[] tokens = line.split("\t");
-		HashObjectSet<IdentifiableCount> columns = new HashObjectSet<>();
-                for (String pairString : tokens[2].split(",")) {
-                    columns.add(new IdentifiableCount(pairString));
-                }
                 _term = new IOTerm(
                         tokens[0],
-                        _typeFactory.get(Integer.parseInt(tokens[1])),
-                        columns
+                        new HashIDSet(tokens[1].split((",")))
                 );
             } else {
                 _term = null;
@@ -273,12 +190,12 @@ public class TermIndexGenerator {
     private class TermSetReader implements TermSetIterator {
 
         private final ArrayList<String> _terms;
-        private final HashMap<String, IndexValue> _termIndex;
+        private final HashMap<String, HashIDSet> _termIndex;
         private int _readIndex;
         
         public TermSetReader(
                 ArrayList<String> terms,
-                HashMap<String, IndexValue> termIndex
+                HashMap<String, HashIDSet> termIndex
         ) {
             _terms = terms;
             _termIndex = termIndex;
@@ -302,8 +219,7 @@ public class TermIndexGenerator {
         public IOTerm term() {
 
             String term = _terms.get(_readIndex);
-            IndexValue entry = _termIndex.get(term);
-            return new IOTerm(term, entry.type(), entry.counts());
+            return new IOTerm(term, _termIndex.get(term));
         }
     }
 
@@ -314,34 +230,25 @@ public class TermIndexGenerator {
     ) throws java.io.IOException {
         
         DefaultValueTransformer transformer = new DefaultValueTransformer();
-        DefaultDataTypeAnnotator typeCheck = new DefaultDataTypeAnnotator();
         
-        HashMap<String, IndexValue> termIndex = new HashMap<>();
+        HashMap<String, HashIDSet> termIndex = new HashMap<>();
         while (readers.hasNext()) {
             ColumnReader reader = readers.next();
-            HashMap<String, ColumnValue> columnValues = new HashMap<>();
+            HashSet<String> columnValues = new HashSet<>();
             while (reader.hasNext()) {
                 ValueCounter colVal = reader.next();
-                String term = transformer.transform(colVal.getText());
-                if (!columnValues.containsKey(term)) {
-                    DataTypeLabel type = typeCheck.getType(term);
-                    columnValues.put(term, new ColumnValue(type, colVal.getCount()));
-                } else {
-                    columnValues.get(term).inc(colVal.getCount());
+                if (!colVal.isEmpty()) {
+                    String term = transformer.transform(colVal.getText());
+                    if (!columnValues.contains(term)) {
+                        columnValues.add(term);
+                    }
                 }
             }
-            for (String term : columnValues.keySet()) {
-                ColumnValue value = columnValues.get(term);
-                IdentifiableCount colCount = new IdentifiableCount(
-                        reader.columnId(),
-                        value.count()
-                );
+            for (String term : columnValues) {
                 if (!termIndex.containsKey(term)) {
-                    HashObjectSet<IdentifiableCount> columns = new HashObjectSet<>();
-                    columns.add(colCount);
-                    termIndex.put(term, new IndexValue(value.type(), colCount));
+                    termIndex.put(term, new HashIDSet(reader.columnId()));
                 } else {
-                    termIndex.get(term).add(colCount);
+                    termIndex.get(term).add(reader.columnId());
                 }
             }
             if (termIndex.size() > bufferSize) {
@@ -363,7 +270,7 @@ public class TermIndexGenerator {
             int termId = 0;
             while ((line = in.readLine()) != null) {
                 String[] tokens = line.split("\t");
-                out.println(termId + "\t" + tokens[0] + "\t" + tokens[1] + "\t" + tokens[2]);
+                out.println(termId + "\t" + tokens[0] + "\t" + tokens[1]);
                 termId++;
             }
         }
@@ -372,7 +279,7 @@ public class TermIndexGenerator {
     }
     
     public void run(
-            File inputDir,
+            List<File> files,
             int bufferSize,
             File outputFile
     ) throws java.io.IOException {
@@ -385,30 +292,27 @@ public class TermIndexGenerator {
         }
         
         this.createIndex(
-                new ValueColumnsReaderFactory(inputDir),
+                new ValueColumnsReaderFactory(files),
                 bufferSize,
                 outputFile
         );
     }
 
     private void writeTermIndex(
-            HashMap<String, IndexValue> termIndex,
+            HashMap<String, HashIDSet> termIndex,
             File outputFile
     ) throws java.io.IOException {
 
         ArrayList<String> terms = new ArrayList<>(termIndex.keySet());
-	Collections.sort(terms);
+        Collections.sort(terms);
 	
         if (!outputFile.exists()) {
             try (PrintWriter out = FileSystem.openPrintWriter(outputFile)) {
                 for (String term : terms) {
-                    IndexValue entry = termIndex.get(term);
+                    HashIDSet columns = termIndex.get(term);
                     out.println(
                             term + "\t" +
-                            entry.type().id() + "\t" +
-                            ColumnElementHelper.toArrayString(
-                                    entry.counts().toList()
-                            )
+                            columns.toIntString()
                     );
                 }
             }
@@ -435,7 +339,7 @@ public class TermIndexGenerator {
     
     private final static String COMMAND =
 	    "Usage:\n" +
-	    "  <input-directory>\n" +
+	    "  <column-file-or-dir>\n" +
 	    "  <mem-buffer-size>\n" +
 	    "  <output-file>";
     
@@ -447,12 +351,12 @@ public class TermIndexGenerator {
         }
 
         File inputDirectory = new File(args[0]);
-        int bufferSize = Integer.parseInt(args[2]);
-        File outputFile = new File(args[3]);
+        int bufferSize = Integer.parseInt(args[1]);
+        File outputFile = new File(args[2]);
         
         try {
             new TermIndexGenerator().run(
-                    inputDirectory,
+                    new FileListReader(".txt").listFiles(inputDirectory),
                     bufferSize,
                     outputFile
             );

@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.urban.data.core.value.IdentifiableValueCounterImpl;
 import org.urban.data.core.value.ValueCounter;
 import org.urban.data.core.value.ValueCounterImpl;
 import org.urban.data.core.io.FileSystem;

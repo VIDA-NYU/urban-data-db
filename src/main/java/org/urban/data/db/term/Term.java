@@ -18,8 +18,8 @@ package org.urban.data.db.term;
 import org.urban.data.core.object.Entity;
 import org.urban.data.core.set.IDSet;
 import org.urban.data.core.set.ImmutableIDSet;
-import org.urban.data.core.value.profiling.types.DataTypeLabel;
-import org.urban.data.core.value.profiling.types.DefaultDataTypeAnnotator;
+import org.urban.data.core.profiling.datatype.label.DataType;
+import org.urban.data.core.profiling.datatype.DefaultDataTypeAnnotator;
 import org.urban.data.db.eq.EQ;
 
 /**
@@ -56,7 +56,7 @@ public class Term extends Entity implements EQ {
      * 
      * @return 
      */
-    public DataTypeLabel type() {
+    public DataType type() {
         
         return new DefaultDataTypeAnnotator().getType(this.name());
     }

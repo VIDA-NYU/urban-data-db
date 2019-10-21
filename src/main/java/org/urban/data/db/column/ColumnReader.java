@@ -24,7 +24,7 @@ import org.urban.data.core.value.ValueCounter;
  * @author Heiko Mueller <heiko.mueller@nyu.edu>
  * @param <T>
  */
-public abstract class ColumnReader<T extends ValueCounter> {
+public abstract class ColumnReader<T extends ValueCounter> implements AutoCloseable {
     
     private final int _columnId;
     

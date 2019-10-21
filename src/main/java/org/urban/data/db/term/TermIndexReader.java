@@ -24,7 +24,7 @@ import org.urban.data.core.set.HashIDSet;
 import org.urban.data.core.set.IdentifiableObjectSet;
 
 /**
- * Read a term index file as a stream. Passes each term to a TermStreamHandler.
+ * Read a term index file as a stream.Passes each term to a TermStreamHandler.
  * 
  * @author Heiko Mueller <heiko.mueller@nyu.edu>
  */
@@ -34,7 +34,7 @@ public class TermIndexReader {
     
     public TermIndexReader(File file) {
 	
-	_file = file;
+        _file = file;
     }
     
     public void read(TermConsumer consumer) throws java.io.IOException {

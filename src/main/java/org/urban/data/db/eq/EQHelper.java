@@ -38,6 +38,18 @@ public class EQHelper {
         return size;
     }
 
+    public static <T extends EQ> int setSize(
+            int[] set,
+            int[] nodes
+    ) {
+        
+        int size = 0;
+        for (int nodeId : set) {
+            size += nodes[nodeId];
+        }
+        return size;
+    }
+
     public static <T extends EQ> IDSet setTerms(
             IDSet set,
             IdentifiableObjectSet<T> nodes
