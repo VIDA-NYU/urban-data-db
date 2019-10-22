@@ -72,6 +72,6 @@ public class ValueColumnsReaderFactory implements ColumnReaderFactory {
 
         File file = _files.pop();
         int columnId = ColumnHelper.getColumnId(file);
-        return new SimpleColumnReader(file, columnId);
+        return new FlexibleColumnReader(file, columnId);
     }
 }
