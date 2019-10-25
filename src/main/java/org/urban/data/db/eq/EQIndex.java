@@ -30,7 +30,7 @@ import org.urban.data.db.column.Column;
  * 
  * @author Heiko Mueller <heiko.mueller@nyu.edu>
  */
-public class EQIndex extends HashObjectSet<EQ> {
+public class EQIndex extends HashObjectSet<EQ> implements EQStream {
 
     private int[] _nodeSizes = null;
     
@@ -145,5 +145,16 @@ public class EQIndex extends HashObjectSet<EQ> {
         for (PrintWriter out : writers) {
             out.close();
         }
+    }
+
+    @Override
+    public void stream(EQConsumer consumer) {
+
+        consumer.open();
+        
+        for (EQ node : this) {
+            consumer.consume(node);
+        }
+        consumer.close();
     }
 }

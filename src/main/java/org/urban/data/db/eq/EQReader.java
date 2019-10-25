@@ -26,7 +26,7 @@ import org.urban.data.core.set.IdentifiableObjectSet;
  * 
  * @author Heiko Mueller <heiko.mueller@nyu.edu>
  */
-public class EQReader {
+public class EQReader implements EQStream {
    
     private final File _file;
     
@@ -50,5 +50,25 @@ public class EQReader {
         }
         
         return result;
+    }
+
+    @Override
+    public void stream(EQConsumer consumer) {
+
+        consumer.open();
+        
+        try (BufferedReader in = FileSystem.openReader(_file)) {
+            String line;
+            while ((line = in.readLine()) != null) {
+                line = line.trim();
+                if (!line.equals("")) {
+                    consumer.consume(new EQImpl(line.split("\t")));
+                }
+            }
+        } catch (java.io.IOException ex) {
+            throw new RuntimeException(ex);
+        }
+        
+        consumer.close();
     }
 }
