@@ -250,10 +250,10 @@ public class TermIndexGenerator {
                 } else {
                     termIndex.get(term).add(reader.columnId());
                 }
-            }
-            if (termIndex.size() > bufferSize) {
-                writeTermIndex(termIndex, outputFile);
-                termIndex = new HashMap<>();
+                if (termIndex.size() > bufferSize) {
+                    writeTermIndex(termIndex, outputFile);
+                    termIndex = new HashMap<>();
+                }
             }
         }
         if (!termIndex.isEmpty()) {
@@ -320,8 +320,7 @@ public class TermIndexGenerator {
         } else {
             System.out.println("MERGE " + termIndex.size() + " TERMS.");
             File tmpFile = File.createTempFile("tmp", outputFile.getName());
-            int count = new TermFileMerger().merge(
-                    new TermFileReader(outputFile),
+            int count = new TermFileMerger().merge(new TermFileReader(outputFile),
                     new TermSetReader(terms, termIndex),
                     FileSystem.openOutputFile(tmpFile)
             );
