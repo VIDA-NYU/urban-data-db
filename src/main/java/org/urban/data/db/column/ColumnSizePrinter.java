@@ -17,70 +17,44 @@ package org.urban.data.db.column;
 
 import java.io.File;
 import java.io.PrintWriter;
-import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.urban.data.core.io.FileListReader;
 import org.urban.data.core.io.FileSystem;
-import org.urban.data.core.profiling.datatype.DefaultDataTypeAnnotator;
-import org.urban.data.core.profiling.datatype.label.DataType;
-import org.urban.data.core.util.count.Counter;
 
 /**
- * Print summary of data types for all values in a given list of columns.
+ * Print number of distinct values and total values in a collection of database
+ * column files.
  * 
  * @author Heiko Mueller <heiko.mueller@nyu.edu>
  */
-public class ColumnTypePrinter {
-    
-    private static final int[] DATATYPES = new int[]{
-        DataType.INTEGER,
-        DataType.LONG,
-        DataType.DECIMAL,
-        DataType.DATE,
-        DataType.GEO,
-        DataType.TEXT
-    };
+public class ColumnSizePrinter {
     
     /**
-     * Output column files that have a fraction of text values that satisfies
-     * the given constraint.
+     * Output number of total values and distinct values per column.
      * 
      * @param files
-     * @param limitCount
      * @param out
      * @throws java.io.IOException 
      */
-    public void run(List<File> files, int limitCount, PrintWriter out) throws java.io.IOException {
+    public void run(List<File> files, PrintWriter out) throws java.io.IOException {
         
-        DefaultDataTypeAnnotator typeCheck = new DefaultDataTypeAnnotator();
+        System.out.println(files.size() + " COLUMNS");
         
         for (File file : files) {
             try (FlexibleColumnReader reader = new FlexibleColumnReader(file)) {
-                HashMap<Integer, Counter> types = new HashMap<>();
+                int cellCount = 0;
                 int valueCount = 0;
                 while (reader.hasNext()) {
-                    DataType type = typeCheck.getType(reader.next().getText());
-                    int key = type.id();
-                    if (!types.containsKey(key)) {
-                        types.put(key, new Counter(1));
-                    } else {
-                        types.get(key).inc();
-                    }
+                    cellCount += reader.next().getCount();
                     valueCount++;
-                    if ((limitCount > 0) && (valueCount >= limitCount)) {
-                        break;
-                    }
                 }
-                String line = Integer.toString(reader.columnId());
-                for (int key : DATATYPES) {
-                    int count = 0;
-                    if (types.containsKey(key)) {
-                        count = types.get(key).value();
-                    }
-                    line += "\t" + count;
-                }
+                String name = file.getName();
+                name = name.substring(0, name.length() - 7);
+                int pos = name.indexOf(".");
+                String line = name.substring(0, pos) + "\t" + name.substring(pos + 1);
+                line += "\t" + valueCount + "\t" + cellCount;
                 out.println(line);
                 System.out.println(line);
             } catch (java.lang.NumberFormatException ex) {
@@ -93,27 +67,24 @@ public class ColumnTypePrinter {
     private static final String COMMAND =
             "Usage:\n" +
             "  <column-file-or-dir>\n" +
-            "  <limit-value-count-per-column> [-1 for all values]\n" +
             "  <output-file>";
     
     private static final Logger LOGGER = Logger
-            .getLogger(ColumnTypePrinter.class.getName());
+            .getLogger(ColumnSizePrinter.class.getName());
     
     public static void main(String[] args) {
         
-        if (args.length != 3) {
+        if (args.length != 2) {
             System.out.println(COMMAND);
             System.exit(-1);
         }
         
         File inFile = new File(args[0]);
-        int limitCount = Integer.parseInt(args[1]);
-        File outputFile = new File(args[2]);
+        File outputFile = new File(args[1]);
         
         try (PrintWriter out = FileSystem.openPrintWriter(outputFile)) {
-            new ColumnTypePrinter().run(
+            new ColumnSizePrinter().run(
                     new FileListReader(".txt").listFiles(inFile),
-                    limitCount,
                     out
             );
         } catch (java.io.IOException ex) {
