@@ -27,7 +27,7 @@ import org.urban.data.db.term.Term;
  * 
  * @author Heiko Mueller <heiko.mueller@nyu.edu>
  */
-public class MutableEquivalenceClass extends IdentifiableObjectImpl {
+public class MutableEquivalenceClass extends IdentifiableObjectImpl implements EQ {
     
     private final HashIDSet _columns;
     private final HashIDSet _terms;
@@ -54,6 +54,7 @@ public class MutableEquivalenceClass extends IdentifiableObjectImpl {
         _columns.add(term.columns());
     }
     
+    @Override
     public IDSet columns() {
 
         return _columns;
@@ -64,16 +65,13 @@ public class MutableEquivalenceClass extends IdentifiableObjectImpl {
         return Integer.compare(this.id(), el.id());
     }
     
+    @Override
     public HashIDSet terms() {
         
         return _terms;
     }
     
-    /**
-     * Print string representation of the equivalence class.
-     * 
-     * @param out 
-     */
+    @Override
     public void write(PrintWriter out) {
 	
         out.println(

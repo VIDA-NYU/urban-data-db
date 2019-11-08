@@ -75,6 +75,7 @@ public class EQImpl extends IdentifiableObjectImpl implements EQ {
         return _terms;
     }
     
+    @Override
     public void write(PrintWriter out) {
         
         out.println(

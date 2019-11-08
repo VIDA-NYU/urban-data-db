@@ -15,6 +15,7 @@
  */
 package org.urban.data.db.eq;
 
+import java.io.PrintWriter;
 import org.urban.data.core.object.IdentifiableObject;
 import org.urban.data.core.set.IDSet;
 
@@ -39,4 +40,11 @@ public interface EQ extends IdentifiableObject {
      * @return 
      */
     public IDSet terms();
+    
+    /**
+     * Print string representation of the equivalence class.
+     * 
+     * @param out 
+     */
+    public void write(PrintWriter out);
 }
