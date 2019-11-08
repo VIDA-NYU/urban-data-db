@@ -26,10 +26,10 @@ import org.urban.data.core.set.IdentifiableObjectSet;
  */
 public class TermBuffer implements TermConsumer {
     
-    private final ObjectFilter _filter;
+    private final ObjectFilter<Integer> _filter;
     private final HashObjectSet<Term> _terms;
 
-    public TermBuffer(ObjectFilter filter) {
+    public TermBuffer(ObjectFilter<Integer> filter) {
 
         _filter = filter;
         _terms = new HashObjectSet();
