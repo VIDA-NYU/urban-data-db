@@ -60,6 +60,15 @@ public class EQIndex extends HashObjectSet<EQ> implements EQStream {
         return new Database(this).columns();
     }
     
+    public IdentifiableObjectSet<Node> nodes() {
+        
+        HashObjectSet nodes = new HashObjectSet<>();
+        for (EQ eq : this) {
+            nodes.add(new Node(eq));
+        }
+        return nodes;
+    }
+    
     public int[] nodeSizes() {
         
         if (_nodeSizes == null) {
