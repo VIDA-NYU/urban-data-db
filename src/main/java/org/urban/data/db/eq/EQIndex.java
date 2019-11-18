@@ -18,6 +18,7 @@ package org.urban.data.db.eq;
 import java.io.File;
 import java.io.PrintWriter;
 import org.urban.data.core.io.FileSystem;
+import org.urban.data.core.prune.SizeFunction;
 import org.urban.data.core.set.HashObjectSet;
 import org.urban.data.core.set.IdentifiableObjectSet;
 import org.urban.data.core.util.count.IdentifiableCount;
@@ -30,7 +31,7 @@ import org.urban.data.db.column.Column;
  * 
  * @author Heiko Mueller <heiko.mueller@nyu.edu>
  */
-public class EQIndex extends HashObjectSet<EQ> implements EQStream {
+public class EQIndex extends HashObjectSet<EQ> implements EQStream, SizeFunction {
 
     private int[] _nodeSizes = null;
     
@@ -58,6 +59,12 @@ public class EQIndex extends HashObjectSet<EQ> implements EQStream {
     public IdentifiableObjectSet<Column> columns() {
         
         return new Database(this).columns();
+    }
+
+    @Override
+    public int getSize(int id) {
+
+        return this.nodeSizes()[id];
     }
     
     public IdentifiableObjectSet<Node> nodes() {

@@ -35,7 +35,7 @@ import org.urban.data.db.term.TermConsumer;
 public class CompressedTermIndexGenerator implements TermConsumer {
 
     private final Counter _counter;
-    private HashMap<String, MutableEquivalenceClass> _eqIndex = null;
+    private HashMap<String, MutableEQ> _eqIndex = null;
     private final PrintWriter _out;
 
     public CompressedTermIndexGenerator(PrintWriter out) {
@@ -49,7 +49,7 @@ public class CompressedTermIndexGenerator implements TermConsumer {
     @Override
     public void close() {
 
-        for (MutableEquivalenceClass eq : _eqIndex.values()) {
+        for (MutableEQ eq : _eqIndex.values()) {
             eq.write(_out);
         }
 
@@ -67,7 +67,7 @@ public class CompressedTermIndexGenerator implements TermConsumer {
             terms.add(term.id());
             _eqIndex.put(
                     key,
-                    new MutableEquivalenceClass(_counter.inc(), term)
+                    new MutableEQ(_counter.inc(), term)
             );
         }
     }

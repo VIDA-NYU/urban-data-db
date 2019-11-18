@@ -23,21 +23,29 @@ import org.urban.data.db.column.ColumnElement;
 import org.urban.data.db.term.Term;
 
 /**
- * Equivalence class with mutable list of column statistics.
+ * Equivalence class with mutable lists for columns and terms.
  * 
  * @author Heiko Mueller <heiko.mueller@nyu.edu>
  */
-public class MutableEquivalenceClass extends IdentifiableObjectImpl implements EQ {
+public class MutableEQ extends IdentifiableObjectImpl implements EQ {
     
     private final HashIDSet _columns;
     private final HashIDSet _terms;
     
-    public MutableEquivalenceClass(int id, Term term) {
+    public MutableEQ(int id, Term term) {
         
         super(id);
         
         _terms = new HashIDSet(term.id());
         _columns = new HashIDSet(term.columns());
+    }
+    
+    public MutableEQ(int id, IDSet columns, IDSet terms) {
+        
+        super(id);
+        
+        _columns = new HashIDSet(columns);
+        _terms = new HashIDSet(terms);
     }
     
     public void add(Term term) {
@@ -55,7 +63,7 @@ public class MutableEquivalenceClass extends IdentifiableObjectImpl implements E
     }
     
     @Override
-    public IDSet columns() {
+    public HashIDSet columns() {
 
         return _columns;
     }
