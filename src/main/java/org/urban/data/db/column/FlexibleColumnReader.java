@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.codec.binary.Hex;
 import org.urban.data.core.value.IdentifiableValueCounterImpl;
 import org.urban.data.core.value.ValueCounter;
 import org.urban.data.core.value.ValueCounterImpl;
@@ -124,8 +125,8 @@ public class FlexibleColumnReader extends ColumnReader<ValueCounter> {
             MessageDigest digest;
             try {
                 digest = MessageDigest.getInstance("SHA-256");
-                String hash = new String(digest.digest(value.getBytes("UTF-8")));
-                System.out.println(value + " -> " + hash);
+                String hash = Hex.encodeHexString(digest.digest(value.getBytes("UTF-8")));
+                System.out.println(hash + "\t" + value);
                 return hash;
             } catch (java.security.NoSuchAlgorithmException | java.io.UnsupportedEncodingException ex) {
                LOGGER.log(Level.SEVERE, null, ex);

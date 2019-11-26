@@ -232,8 +232,10 @@ public class TermIndexGenerator {
         DefaultValueTransformer transformer = new DefaultValueTransformer();
         
         HashMap<String, HashIDSet> termIndex = new HashMap<>();
+        int columnCount = 0;
         while (readers.hasNext()) {
             ColumnReader reader = readers.next();
+            columnCount++;
             HashSet<String> columnValues = new HashSet<>();
             while (reader.hasNext()) {
                 ValueCounter colVal = reader.next();
@@ -251,6 +253,7 @@ public class TermIndexGenerator {
                     termIndex.get(term).add(reader.columnId());
                 }
                 if (termIndex.size() > bufferSize) {
+                    System.out.println("WRITE AT COLUMN " + columnCount);
                     writeTermIndex(termIndex, outputFile);
                     termIndex = new HashMap<>();
                 }
@@ -353,7 +356,7 @@ public class TermIndexGenerator {
     
     public static void main(String[] args) {
         
-        System.out.println("Term Index Generator (Version 0.2.1)");
+        System.out.println("Term Index Generator (Version 0.2.2)");
 
         if (args.length != 4) {
             System.out.println(COMMAND);
