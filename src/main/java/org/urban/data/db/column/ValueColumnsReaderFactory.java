@@ -30,15 +30,21 @@ import org.urban.data.core.value.ValueCounter;
 public class ValueColumnsReaderFactory implements ColumnReaderFactory {
 
     private final LinkedList<File> _files;
+    private final int _hashLengthThreshold;
     
-    public ValueColumnsReaderFactory(File directory, ObjectFilter<Integer> filter) {
-	
+    public ValueColumnsReaderFactory(
+            File directory,
+            ObjectFilter<Integer> filter,
+            int hashLengthThreshold
+    ) {
         if (!directory.exists()) {
             throw new IllegalArgumentException("Directory " + directory.getAbsolutePath() + " does not exist");
         } else if (!directory.isDirectory()) {
             throw new IllegalArgumentException(directory.getAbsolutePath() + " not a directory");
         }
         
+        _hashLengthThreshold = hashLengthThreshold;
+
         _files = new LinkedList<>();
 
         for (File file : directory.listFiles()) {
@@ -51,14 +57,15 @@ public class ValueColumnsReaderFactory implements ColumnReaderFactory {
         }
     }
     
-    public ValueColumnsReaderFactory(File directory) {
+    public ValueColumnsReaderFactory(File directory, int hashLengthThreshold) {
 	
-        this(directory, new AnyObjectFilter<Integer>());
+        this(directory, new AnyObjectFilter<Integer>(), hashLengthThreshold);
     }
     
-    public ValueColumnsReaderFactory(List<File> files) {
+    public ValueColumnsReaderFactory(List<File> files, int hashLengthThreshold) {
         
         _files = new LinkedList<>(files);
+        _hashLengthThreshold = hashLengthThreshold;
     }
     
     @Override
@@ -72,6 +79,6 @@ public class ValueColumnsReaderFactory implements ColumnReaderFactory {
 
         File file = _files.pop();
         int columnId = ColumnHelper.getColumnId(file);
-        return new FlexibleColumnReader(file, columnId);
+        return new FlexibleColumnReader(file, columnId, _hashLengthThreshold);
     }
 }

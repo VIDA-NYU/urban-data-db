@@ -281,10 +281,9 @@ public class TermIndexGenerator {
     public void run(
             List<File> files,
             int bufferSize,
+            int hashLengthThreshold,
             File outputFile
     ) throws java.io.IOException {
-        
-        
         // Create the directory for the output file if it does not exist.
         FileSystem.createParentFolder(outputFile);
         if (outputFile.exists()) {
@@ -292,12 +291,21 @@ public class TermIndexGenerator {
         }
         
         this.createIndex(
-                new ValueColumnsReaderFactory(files),
+                new ValueColumnsReaderFactory(files, hashLengthThreshold),
                 bufferSize,
                 outputFile
         );
     }
 
+        
+    public void run(
+            List<File> files,
+            int bufferSize,
+            File outputFile
+    ) throws java.io.IOException {
+        this.run(files, bufferSize, -1, outputFile);
+    }
+    
     private void writeTermIndex(
             HashMap<String, HashIDSet> termIndex,
             File outputFile
@@ -340,23 +348,28 @@ public class TermIndexGenerator {
 	    "Usage:\n" +
 	    "  <column-file-or-dir>\n" +
 	    "  <mem-buffer-size>\n" +
+            "  <hash-length-threshold>\n" +
 	    "  <output-file>";
     
     public static void main(String[] args) {
         
-        if (args.length != 3) {
+        System.out.println("Term Index Generator (Version 0.2.1)");
+
+        if (args.length != 4) {
             System.out.println(COMMAND);
             System.exit(-1);
         }
 
         File inputDirectory = new File(args[0]);
         int bufferSize = Integer.parseInt(args[1]);
-        File outputFile = new File(args[2]);
+        int hashLengthThreshold = Integer.parseInt(args[2]);
+        File outputFile = new File(args[3]);
         
         try {
             new TermIndexGenerator().run(
                     new FileListReader(".txt").listFiles(inputDirectory),
                     bufferSize,
+                    hashLengthThreshold,
                     outputFile
             );
         } catch (java.io.IOException ex) {
