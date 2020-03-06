@@ -27,20 +27,19 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.urban.data.core.io.FileListReader;
 import org.urban.data.core.value.ValueCounter;
-import org.urban.data.core.profiling.datatype.ValueTypeFactory;
 import org.urban.data.core.value.DefaultValueTransformer;
 import org.urban.data.core.set.HashIDSet;
 import org.urban.data.core.io.FileSystem;
 import org.urban.data.core.set.IDSet;
 import org.urban.data.core.util.MemUsagePrinter;
+import org.urban.data.db.column.CSVColumnsReaderFactory;
 import org.urban.data.db.column.ColumnReader;
-import org.urban.data.db.column.ValueColumnsReaderFactory;
+import org.urban.data.db.column.ColumnReaderFactory;
 
 /**
  * Create a term index file. The output file is tab-delimited and contains three
@@ -136,7 +135,6 @@ public class TermIndexGenerator {
     
         private BufferedReader _in = null;
         private IOTerm _term = null;
-        private final ValueTypeFactory _typeFactory = new ValueTypeFactory();
         
         public TermFileReader(InputStream is) throws java.io.IOException {
 
@@ -224,7 +222,7 @@ public class TermIndexGenerator {
     }
 
     public void createIndex(
-            ValueColumnsReaderFactory readers,
+            ColumnReaderFactory readers,
             int bufferSize,
             File outputFile
     ) throws java.io.IOException {
@@ -236,26 +234,20 @@ public class TermIndexGenerator {
         while (readers.hasNext()) {
             ColumnReader reader = readers.next();
             columnCount++;
-            HashSet<String> columnValues = new HashSet<>();
             while (reader.hasNext()) {
                 ValueCounter colVal = reader.next();
                 if (!colVal.isEmpty()) {
                     String term = transformer.transform(colVal.getText());
-                    if (!columnValues.contains(term)) {
-                        columnValues.add(term);
+                    if (!termIndex.containsKey(term)) {
+                        termIndex.put(term, new HashIDSet(reader.columnId()));
+                    } else {
+                        termIndex.get(term).add(reader.columnId());
                     }
-                }
-            }
-            for (String term : columnValues) {
-                if (!termIndex.containsKey(term)) {
-                    termIndex.put(term, new HashIDSet(reader.columnId()));
-                } else {
-                    termIndex.get(term).add(reader.columnId());
-                }
-                if (termIndex.size() > bufferSize) {
-                    System.out.println("WRITE AT COLUMN " + columnCount);
-                    writeTermIndex(termIndex, outputFile);
-                    termIndex = new HashMap<>();
+                    if (termIndex.size() > bufferSize) {
+                        System.out.println("WRITE AT COLUMN " + columnCount);
+                        writeTermIndex(termIndex, outputFile);
+                        termIndex = new HashMap<>();
+                    }
                 }
             }
         }
@@ -284,29 +276,17 @@ public class TermIndexGenerator {
     public void run(
             List<File> files,
             int bufferSize,
-            int hashLengthThreshold,
             File outputFile
     ) throws java.io.IOException {
+        
         // Create the directory for the output file if it does not exist.
         FileSystem.createParentFolder(outputFile);
         if (outputFile.exists()) {
             outputFile.delete();
         }
         
-        this.createIndex(
-                new ValueColumnsReaderFactory(files, hashLengthThreshold),
-                bufferSize,
-                outputFile
-        );
-    }
-
-        
-    public void run(
-            List<File> files,
-            int bufferSize,
-            File outputFile
-    ) throws java.io.IOException {
-        this.run(files, bufferSize, -1, outputFile);
+        CSVColumnsReaderFactory readers = new CSVColumnsReaderFactory(files);
+        this.createIndex(readers, bufferSize, outputFile);
     }
     
     private void writeTermIndex(
@@ -356,7 +336,7 @@ public class TermIndexGenerator {
     
     public static void main(String[] args) {
         
-        System.out.println("Term Index Generator (Version 0.2.2)");
+        System.out.println("Term Index Generator (Version 0.2.3)");
 
         if (args.length != 4) {
             System.out.println(COMMAND);
@@ -365,14 +345,12 @@ public class TermIndexGenerator {
 
         File inputDirectory = new File(args[0]);
         int bufferSize = Integer.parseInt(args[1]);
-        int hashLengthThreshold = Integer.parseInt(args[2]);
         File outputFile = new File(args[3]);
         
         try {
             new TermIndexGenerator().run(
                     new FileListReader(".txt").listFiles(inputDirectory),
                     bufferSize,
-                    hashLengthThreshold,
                     outputFile
             );
         } catch (java.io.IOException ex) {
