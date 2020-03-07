@@ -35,17 +35,25 @@ import org.urban.data.db.term.TermConsumer;
 public class CompressedTermIndexGenerator implements TermConsumer {
 
     private final Counter _counter;
+    private final String _domain;
     private HashMap<String, MutableEQ> _eqIndex = null;
     private final PrintWriter _out;
+    private int _termCount = 0;
 
-    public CompressedTermIndexGenerator(PrintWriter out) {
+    public CompressedTermIndexGenerator(PrintWriter out, String domain) {
 
         _out = out;
-
+        _domain = domain;
+        
         _eqIndex = new HashMap<>();
         _counter = new Counter(0);
     }
 
+    public CompressedTermIndexGenerator(PrintWriter out) {
+        
+        this(out, null);
+    }
+    
     @Override
     public void close() {
 
@@ -53,7 +61,11 @@ public class CompressedTermIndexGenerator implements TermConsumer {
             eq.write(_out);
         }
 
-        System.out.println("NUMBER OF EQUIVALENCE CLASSES IS " + _eqIndex.size());
+        if (_domain != null) {
+            System.out.println(_domain + "\t" + _termCount + "\t" + _eqIndex.size());
+        } else {
+            System.out.println(_termCount + "\t" + _eqIndex.size());
+        }
     }
 
     @Override
@@ -70,10 +82,12 @@ public class CompressedTermIndexGenerator implements TermConsumer {
                     new MutableEQ(_counter.inc(), term)
             );
         }
+        _termCount++;
     }
 
     @Override
     public void open() {
 
+        _termCount = 0;
     }
 }

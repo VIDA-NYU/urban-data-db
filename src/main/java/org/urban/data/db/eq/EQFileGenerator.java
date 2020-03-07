@@ -50,7 +50,7 @@ public class EQFileGenerator {
         
         File inputFile = new File(args[0]);
         File outputFile = new File(args[1]);     
-        
+    
         try (PrintWriter out = FileSystem.openPrintWriter(outputFile)) {
             new TermIndexReader(inputFile)
                     .read(new CompressedTermIndexGenerator(out));

@@ -42,9 +42,9 @@ public class TermIndexReader {
         consumer.open();
         
         try (BufferedReader in = FileSystem.openReader(_file)) {
-	    String line;
-	    while ((line = in.readLine()) != null) {
-		String[] tokens = line.split("\t");
+            String line;
+            while ((line = in.readLine()) != null) {
+                String[] tokens = line.split("\t");
                 consumer.consume(
                         new Term(
                                 Integer.parseInt(tokens[0]),
