@@ -36,10 +36,12 @@ public class DomainsEQFileGenerator {
             if (domainDir.isDirectory()) {
                 String domain = domainDir.getName();
                 File eqIndexFile = FileSystem.joinPath(domainDir, "compressed-term-index.txt.gz");
-                File termIndexFile = FileSystem.joinPath(domainDir, "term-index.txt.gz");
-                try (PrintWriter out = FileSystem.openPrintWriter(eqIndexFile)) {
-                    new TermIndexReader(termIndexFile)
-                            .read(new CompressedTermIndexGenerator(out, domain));
+                if (!eqIndexFile.exists()) {
+                    File termIndexFile = FileSystem.joinPath(domainDir, "term-index.txt.gz");
+                    try (PrintWriter out = FileSystem.openPrintWriter(eqIndexFile)) {
+                        new TermIndexReader(termIndexFile)
+                                .read(new CompressedTermIndexGenerator(out, domain));
+                    }
                 }
             }
         }

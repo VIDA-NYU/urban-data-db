@@ -43,7 +43,7 @@
                    <archive>
                       <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>org.urban.data.db.eq.DomainsEQFileGenerator</mainClass>
+                            <mainClass>org.urban.data.db.eq.DomainsStatsWriter</mainClass>
                       </manifest>
                    </archive>
                 </configuration>
