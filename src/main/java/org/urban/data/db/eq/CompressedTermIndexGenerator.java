@@ -17,8 +17,10 @@ package org.urban.data.db.eq;
 
 import java.io.PrintWriter;
 import java.util.HashMap;
+import java.util.List;
 import org.urban.data.core.set.HashIDSet;
-import org.urban.data.core.util.count.Counter;
+import org.urban.data.core.util.MemUsagePrinter;
+import org.urban.data.core.util.StringHelper;
 import org.urban.data.db.term.Term;
 import org.urban.data.db.term.TermConsumer;
 
@@ -34,9 +36,8 @@ import org.urban.data.db.term.TermConsumer;
  */
 public class CompressedTermIndexGenerator implements TermConsumer {
 
-    private final Counter _counter;
     private final String _domain;
-    private HashMap<String, MutableEQ> _eqIndex = null;
+    private HashMap<Integer, HashMap<String, HashIDSet>> _eqIndex = null;
     private final PrintWriter _out;
     private int _termCount = 0;
 
@@ -46,7 +47,6 @@ public class CompressedTermIndexGenerator implements TermConsumer {
         _domain = domain;
         
         _eqIndex = new HashMap<>();
-        _counter = new Counter(0);
     }
 
     public CompressedTermIndexGenerator(PrintWriter out) {
@@ -57,32 +57,58 @@ public class CompressedTermIndexGenerator implements TermConsumer {
     @Override
     public void close() {
 
-        for (MutableEQ eq : _eqIndex.values()) {
-            eq.write(_out);
+        System.out.println(_termCount + " TERMS READ @ " + new java.util.Date());
+        
+        int counter = 0;
+        
+        for (HashMap<String, HashIDSet> bucket : _eqIndex.values()) {
+            for (String columns : bucket.keySet()) {
+                _out.print(counter + "\t");
+                boolean isFirst = true;
+                for (int termId : bucket.get(columns).toSortedList()) {
+                    if (isFirst) {
+                        _out.print(termId);
+                        isFirst = false;
+                    } else {
+                        _out.print("," + termId);
+                    }
+                }
+                _out.println("\t" + columns);
+                counter++;
+            }
         }
 
         if (_domain != null) {
-            System.out.println(_domain + "\t" + _termCount + "\t" + _eqIndex.size());
+            System.out.println(_domain + "\t" + _termCount + "\t" + counter);
         } else {
-            System.out.println(_termCount + "\t" + _eqIndex.size());
+            System.out.println(_termCount + "\t" + counter);
         }
     }
 
     @Override
     public void consume(Term term) {
 
-        String key = term.columns().toIntString();
-        if (_eqIndex.containsKey(key)) {
-            _eqIndex.get(key).add(term);
+        List<Integer> values = term.columns().toSortedList();
+        int index = values.get(0);
+        String key =  StringHelper.joinIntegers(values);
+        
+        if (_eqIndex.containsKey(index)) {
+            HashMap<String, HashIDSet> bucket = _eqIndex.get(index);
+            if (bucket.containsKey(key)) {
+                bucket.get(key).add(term.id());
+            } else {
+                bucket.put(key, new HashIDSet(term.id()));
+            }
         } else {
-            HashIDSet terms = new HashIDSet();
-            terms.add(term.id());
-            _eqIndex.put(
-                    key,
-                    new MutableEQ(_counter.inc(), term)
-            );
+            HashMap<String, HashIDSet> bucket = new HashMap<>();
+            bucket.put(key, new HashIDSet(term.id()));
+            _eqIndex.put(index, bucket);
         }
         _termCount++;
+        if ((_termCount % 100000000) == 0) {
+            System.out.println(_termCount + " @ " + new java.util.Date());
+            new MemUsagePrinter().print();
+        }
     }
 
     @Override
