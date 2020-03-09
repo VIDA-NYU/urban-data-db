@@ -15,7 +15,6 @@
  */
 package org.urban.data.db.eq;
 
-import java.io.PrintWriter;
 import org.urban.data.core.object.IdentifiableObjectImpl;
 import org.urban.data.core.set.HashIDSet;
 import org.urban.data.core.set.IDSet;
@@ -48,6 +47,12 @@ public class EQImpl extends IdentifiableObjectImpl implements EQ {
                 parseColumnList(tokens[2])
         );
     }
+
+    @Override
+    public int columnCount() {
+
+        return _columns.length();
+    }
     
     @Override
     public IDSet columns() {
@@ -70,18 +75,14 @@ public class EQImpl extends IdentifiableObjectImpl implements EQ {
     }
     
     @Override
-    public IDSet terms() {
+    public int termCount() {
         
-        return _terms;
+        return _terms.length();
     }
     
     @Override
-    public void write(PrintWriter out) {
+    public IDSet terms() {
         
-        out.println(
-                this.id() + "\t" +
-                this.terms().toIntString() + "\t" +
-                this.columns().toIntString()
-        );
+        return _terms;
     }
 }

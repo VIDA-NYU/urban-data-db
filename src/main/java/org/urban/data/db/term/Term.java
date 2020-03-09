@@ -15,7 +15,6 @@
  */
 package org.urban.data.db.term;
 
-import java.io.PrintWriter;
 import org.urban.data.core.object.Entity;
 import org.urban.data.core.set.IDSet;
 import org.urban.data.core.set.ImmutableIDSet;
@@ -41,11 +40,23 @@ public class Term extends Entity implements EQ {
     }
 
     @Override
+    public int columnCount() {
+        
+        return _columns.length();
+    }
+    
+    @Override
     public IDSet columns() {
         
         return _columns;
     }
 
+    @Override
+    public int termCount() {
+        
+        return 1;
+    }
+    
     @Override
     public IDSet terms() {
 
@@ -60,15 +71,5 @@ public class Term extends Entity implements EQ {
     public DataType type() {
         
         return new DefaultDataTypeAnnotator().getType(this.name());
-    }
-
-    @Override
-    public void write(PrintWriter out) {
-
-        out.println(
-                this.id() + "\t" +
-                this.name() + "\t" +
-                this.columns().toIntString()
-        );
     }
 }

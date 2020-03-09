@@ -82,7 +82,7 @@ public class DomainsStatsWriter {
                     TermStatsGenerator termCounter = new TermStatsGenerator();
                     new TermIndexReader(termFile).read(termCounter);
                     EQCounter eqCounter = new EQCounter();
-                    new EQReader(eqFile).stream(eqCounter);
+                    new EQReader(eqFile, new LargeEQFactory()).stream(eqCounter);
                     String line = domain + "\t";
                     line += termCounter.termCount() + "\t";
                     line += termCounter.avgColumnCount().toPlainString() + "\t";
@@ -104,7 +104,7 @@ public class DomainsStatsWriter {
     
     public static void main(String[] args) {
     
-        System.out.println("Socrata Data Study - Domain Stats Writer - 0.1.1");
+        System.out.println("Socrata Data Study - Domain Stats Writer - 0.1.2");
         
         if (args.length != 2) {
             System.out.println(COMMAND);
