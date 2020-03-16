@@ -43,7 +43,11 @@
                    <archive>
                       <manifest>
                             <addClasspath>true</addClasspath>
+<<<<<<< HEAD
                             <mainClass>org.urban.data.db.eq.DomainsStatsWriter</mainClass>
+=======
+                            <mainClass>org.urban.data.db.column.ColumnSimilarityHistorgamComputer</mainClass>
+>>>>>>> b4e2efb4d0d5f78b8e55e127384522ccaf2636dd
                       </manifest>
                    </archive>
                 </configuration>
