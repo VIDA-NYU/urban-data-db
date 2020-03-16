@@ -28,6 +28,13 @@ import org.urban.data.core.set.IDSet;
 public interface EQ extends IdentifiableObject {
    
     /**
+     * Number of columns the equivalence class occurs in.
+     * 
+     * @return 
+     */
+    public int columnCount();
+    
+    /**
      * List of identifier for columns the equivalence class occurs in.
      * 
      * @return 
@@ -35,16 +42,16 @@ public interface EQ extends IdentifiableObject {
     public IDSet columns();
     
     /**
+     * Number of terms in the equivalence class.
+     * 
+     * @return 
+     */
+    public int termCount();
+    
+    /**
      * List of identifier for terms in the equivalence class.
      * 
      * @return 
      */
     public IDSet terms();
-    
-    /**
-     * Print string representation of the equivalence class.
-     * 
-     * @param out 
-     */
-    public void write(PrintWriter out);
 }

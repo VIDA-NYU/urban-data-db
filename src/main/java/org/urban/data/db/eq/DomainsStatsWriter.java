@@ -17,10 +17,14 @@ package org.urban.data.db.eq;
 
 import java.io.File;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.urban.data.core.io.FileSystem;
-import org.urban.data.db.term.TermCounter;
+import org.urban.data.db.term.Term;
+import org.urban.data.db.term.TermConsumer;
 import org.urban.data.db.term.TermIndexReader;
 
 /**
@@ -31,6 +35,42 @@ import org.urban.data.db.term.TermIndexReader;
  */
 public class DomainsStatsWriter {
        
+    private class TermStatsGenerator implements TermConsumer {
+
+        private int _count = 0;
+        private long _columns = 0;
+        
+        public BigDecimal avgColumnCount() {
+            
+            return new BigDecimal(_columns)
+                    .divide(new BigDecimal(_count), MathContext.DECIMAL64)
+                    .setScale(6, RoundingMode.CEILING);
+        }
+        
+        @Override
+        public void close() {
+
+        }
+
+        @Override
+        public void consume(Term term) {
+
+            _count++;
+            _columns += (long)term.columns().length();
+        }
+
+        @Override
+        public void open() {
+
+            _count = 0;
+        }
+
+        public int termCount() {
+
+            return _count;
+        }
+    }
+
     public void run(File baseDir, PrintWriter out) throws java.io.IOException {
         
         for (File domainDir : baseDir.listFiles()) {
@@ -39,20 +79,16 @@ public class DomainsStatsWriter {
                 File eqFile = FileSystem.joinPath(domainDir, "compressed-term-index.txt.gz");
                 File termFile = FileSystem.joinPath(domainDir, "term-index.txt.gz");
                 if ((eqFile.exists()) && (termFile.exists())) {
-                    TermCounter termCounter = new TermCounter();
+                    TermStatsGenerator termCounter = new TermStatsGenerator();
                     new TermIndexReader(termFile).read(termCounter);
                     EQCounter eqCounter = new EQCounter();
-                    new EQReader(eqFile).stream(eqCounter);
-                    out.println(
-                            domain + "\t" +
-                            termCounter.termCount() + "\t" +
-                            eqCounter.equivalenceClassCount()
-                    );
-                    System.out.println(
-                            domain + "\t" +
-                            termCounter.termCount() + "\t" +
-                            eqCounter.equivalenceClassCount()
-                    );
+                    new EQReader(eqFile, new LargeEQFactory()).stream(eqCounter);
+                    String line = domain + "\t";
+                    line += termCounter.termCount() + "\t";
+                    line += termCounter.avgColumnCount().toPlainString() + "\t";
+                    line += eqCounter.equivalenceClassCount();
+                    out.println(line);
+                    System.out.println(line);
                 }
             }
         }
@@ -68,7 +104,7 @@ public class DomainsStatsWriter {
     
     public static void main(String[] args) {
     
-        System.out.println("Socrata Data Study - Domain Stats Writer - 0.1.0");
+        System.out.println("Socrata Data Study - Domain Stats Writer - 0.1.2");
         
         if (args.length != 2) {
             System.out.println(COMMAND);

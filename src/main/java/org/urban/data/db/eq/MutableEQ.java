@@ -15,7 +15,6 @@
  */
 package org.urban.data.db.eq;
 
-import java.io.PrintWriter;
 import org.urban.data.core.object.IdentifiableObjectImpl;
 import org.urban.data.core.set.HashIDSet;
 import org.urban.data.core.set.IDSet;
@@ -61,6 +60,12 @@ public class MutableEQ extends IdentifiableObjectImpl implements EQ {
         _terms.add(term.id());
         _columns.add(term.columns());
     }
+
+    @Override
+    public int columnCount() {
+
+        return _columns.length();
+    }
     
     @Override
     public HashIDSet columns() {
@@ -72,20 +77,16 @@ public class MutableEQ extends IdentifiableObjectImpl implements EQ {
 
         return Integer.compare(this.id(), el.id());
     }
+
+    @Override
+    public int termCount() {
+
+        return _terms.length();
+    }
     
     @Override
     public HashIDSet terms() {
         
         return _terms;
-    }
-    
-    @Override
-    public void write(PrintWriter out) {
-	
-        out.println(
-                this.id() + "\t" +
-                _terms.toIntString() + "\t" +
-                _columns.toIntString()
-        );
     }
 }
