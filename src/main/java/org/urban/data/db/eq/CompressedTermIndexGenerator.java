@@ -16,10 +16,10 @@
 package org.urban.data.db.eq;
 
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import org.urban.data.core.set.HashIDSet;
-import org.urban.data.core.util.MemUsagePrinter;
 import org.urban.data.core.util.StringHelper;
 import org.urban.data.db.term.Term;
 import org.urban.data.db.term.TermConsumer;
@@ -36,36 +36,74 @@ import org.urban.data.db.term.TermConsumer;
  */
 public class CompressedTermIndexGenerator implements TermConsumer {
 
+    private class TermIDSet {
+        
+        private final int _limit;
+        private int _size;
+        private final List<Integer> _terms;
+        
+        public TermIDSet(int termId, int limit) {
+            
+            _limit = limit;
+            
+            _terms = new ArrayList<>();
+            _terms.add(termId);
+            
+            _size = 1;
+        }
+        
+        public void add(int termId) {
+            
+            if (_terms.size() < _limit) {
+                _terms.add(termId);
+            }
+            _size++;
+        }
+        
+        public List<Integer> toSortedList() {
+            
+            Collections.sort(_terms);
+            return _terms;
+        }
+        
+        public int size() {
+            
+            return _size;
+        }
+    }
+    
     private final String _domain;
-    private HashMap<Integer, HashMap<String, HashIDSet>> _eqIndex = null;
+    private HashMap<Integer, HashMap<String, TermIDSet>> _eqIndex = null;
     private final PrintWriter _out;
+    private final int _sizeLimit;
     private int _termCount = 0;
 
-    public CompressedTermIndexGenerator(PrintWriter out, String domain) {
+    public CompressedTermIndexGenerator(PrintWriter out, String domain, int sizeLimit) {
 
         _out = out;
         _domain = domain;
+        _sizeLimit = sizeLimit;
         
         _eqIndex = new HashMap<>();
     }
 
     public CompressedTermIndexGenerator(PrintWriter out) {
         
-        this(out, null);
+        this(out, null, Integer.MAX_VALUE);
     }
     
     @Override
     public void close() {
 
-        System.out.println(_termCount + " TERMS READ @ " + new java.util.Date());
-        
         int counter = 0;
         
-        for (HashMap<String, HashIDSet> bucket : _eqIndex.values()) {
+        for (HashMap<String, TermIDSet> bucket : _eqIndex.values()) {
             for (String columns : bucket.keySet()) {
+                TermIDSet terms = bucket.get(columns);
                 _out.print(counter + "\t");
+                _out.print(terms.size() + "\t");
                 boolean isFirst = true;
-                for (int termId : bucket.get(columns).toSortedList()) {
+                for (int termId : terms.toSortedList()) {
                     if (isFirst) {
                         _out.print(termId);
                         isFirst = false;
@@ -93,22 +131,18 @@ public class CompressedTermIndexGenerator implements TermConsumer {
         String key =  StringHelper.joinIntegers(values);
         
         if (_eqIndex.containsKey(index)) {
-            HashMap<String, HashIDSet> bucket = _eqIndex.get(index);
+            HashMap<String, TermIDSet> bucket = _eqIndex.get(index);
             if (bucket.containsKey(key)) {
                 bucket.get(key).add(term.id());
             } else {
-                bucket.put(key, new HashIDSet(term.id()));
+                bucket.put(key, new TermIDSet(term.id(), _sizeLimit));
             }
         } else {
-            HashMap<String, HashIDSet> bucket = new HashMap<>();
-            bucket.put(key, new HashIDSet(term.id()));
+            HashMap<String, TermIDSet> bucket = new HashMap<>();
+            bucket.put(key, new TermIDSet(term.id(), _sizeLimit));
             _eqIndex.put(index, bucket);
         }
         _termCount++;
-        if ((_termCount % 100000000) == 0) {
-            System.out.println(_termCount + " @ " + new java.util.Date());
-            new MemUsagePrinter().print();
-        }
     }
 
     @Override

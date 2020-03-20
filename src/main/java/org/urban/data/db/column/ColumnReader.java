@@ -30,7 +30,7 @@ public abstract class ColumnReader<T extends ValueCounter> implements AutoClosea
     
     public ColumnReader(int columnId) {
 	
-	_columnId = columnId;
+        _columnId = columnId;
     }
     
     /**
@@ -51,7 +51,7 @@ public abstract class ColumnReader<T extends ValueCounter> implements AutoClosea
      */
     public int columnId() {
 	
-	return _columnId;
+        return _columnId;
     }
     
     /**
